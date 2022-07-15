@@ -1,6 +1,3 @@
-## load libraries
-library(data.table)
-
 ## utility functions used in analysis and simulations of ply211
 ## amended to fit the approach taken in simulating with EXIT
 ## also, Plymouth HPC has R 3.6.1, while I have 4.1.0
@@ -34,7 +31,7 @@ library(data.table)
 
 ## construct ordinal patterns
 ## it takes a data.table output by participant_table
-opg <- function(x) {
+ostring <- function(x) {
     number <- nrow(x) # check how many members need to be ordered
     odin <- as.vector(t(x[, c("stim", "punctuation")]))
     ## look for equalities

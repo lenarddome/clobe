@@ -1,0 +1,3 @@
+useDynLib(psp, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")    # export all identifiers starting with letters
