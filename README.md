@@ -1,2 +1,3 @@
-# qglobe
-Qualitative Global Benchmark and Evaluation Toolkit for Formal Compuational Models
+# globe
+
+Global Benchmark and Evaluation Toolkit for Formal Compuational Models
