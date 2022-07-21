@@ -1,16 +1,14 @@
 Package: globe
 Title: Global Benchmark and Evaluation Tools for Formal Computational Models
-Version: 0.5.1
+Version: 0.2.0
 Date: 2022-06-12
 Authors@R: c(person("Lenard", "Dome",
                    email = "lenarddome@gmail.com",
                    role = c("aut", "cre")))
-
 License: GPL (>= 3)
 URL: https://github.com/lenarddome/globe
 BugReports: https://github.com/lenarddome/globe/issues
-Imports: Rcpp (>= 1.0.8.3),
-         data.table
+Imports: Rcpp (>= 1.0.9)
 LinkingTo: Rcpp, RcppArmadillo
 Encoding: UTF-8
 Suggests:

@@ -1,3 +1,3 @@
-useDynLib(psp, .registration=TRUE)
+useDynLib(globe, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
-exportPattern("^[[:alpha:]]+")    # export all identifiers starting with letters
+exportPattern("^[[:alpha:]]+")
