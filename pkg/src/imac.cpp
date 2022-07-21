@@ -1,15 +1,13 @@
 // Copyright 2022 <Lenard Dome> [legal/copyright]
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
-#include <fstream>
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 using namespace arma;
 
-
 // [[Rcpp::export]]
-mat imac(vec probabilities, vec thresholds) {
+arma::mat imac(arma::vec probabilities, arma::vec thresholds) {
   // setup environment
   mat inequality(probabilities.n_elem, probabilities.n_elem, fill::value(datum::nan));
   for (uword i = 0; i < probabilities.n_elem - 1; i++) {
