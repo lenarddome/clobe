@@ -11,6 +11,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// brutes
+Rcpp::List brutes(arma::rowvec probabilities, arma::vec thresholds);
+RcppExport SEXP _globe_brutes(SEXP probabilitiesSEXP, SEXP thresholdsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::rowvec >::type probabilities(probabilitiesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
+    rcpp_result_gen = Rcpp::wrap(brutes(probabilities, thresholds));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gdistance
 List gdistance(arma::cube human, arma::cube model, double universal, double weight, arma::colvec frequencies, bool xtdo);
 RcppExport SEXP _globe_gdistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP xtdoSEXP) {
@@ -41,6 +53,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_globe_brutes", (DL_FUNC) &_globe_brutes, 2},
     {"_globe_gdistance", (DL_FUNC) &_globe_gdistance, 6},
     {"_globe_imac", (DL_FUNC) &_globe_imac, 2},
     {NULL, NULL, 0}

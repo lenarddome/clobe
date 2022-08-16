@@ -9,14 +9,15 @@ using namespace arma;
 // [[Rcpp::export]]
 arma::mat imac(arma::vec probabilities, arma::vec thresholds) {
   // setup environment
-  mat inequality(probabilities.n_elem, probabilities.n_elem, fill::value(datum::nan));
-  for (uword i = 0; i < probabilities.n_elem - 1; i++) {
+  mat inequality(probabilities.n_elem, probabilities.n_elem, fill::value(2));
+  for (uword i = 0; i < probabilities.n_elem; i++) {
     for (uword k = i + 1; k < probabilities.n_elem; k++) {
       inequality(i, k) =  probabilities[i] - probabilities[k];
     }
   }
-  inequality.elem( find(inequality > thresholds[0])).ones();
+  // apply the rules to the differences
+  inequality.elem( find(inequality > thresholds[0] && inequality < 2)).fill(1);
   inequality.elem( find(inequality < thresholds[1])).fill(-1);
-  inequality.elem( find(inequality < thresholds[0] && inequality > thresholds[1])).zeros();
+  inequality.elem( find(inequality > thresholds[1] && inequality < thresholds[0])).fill(0);
   return(inequality);
 }
