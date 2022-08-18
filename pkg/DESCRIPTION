@@ -1,6 +1,6 @@
 Package: globe
 Title: Global Benchmark and Evaluation Tools for Formal Computational Models
-Version: 0.2.0
+Version: 0.5.3
 Date: 2022-06-12
 Authors@R: c(person("Lenard", "Dome",
                    email = "lenarddome@gmail.com",
