@@ -1,0 +1,12 @@
+^docs$
+^tmp$
+^_config.yml$
+^[\.]md$$
+^LICENSE$
+^\.gitignore$
+^.github$
+^.git$
+^README\.md$
+^_pkgdown\.yml$
+^pkgdown$
+^.vscode/

@@ -40,3 +40,8 @@ vignettes/*.pdf
 .vscode/settings.json
 
 /tmp/
+
+
+/docs/tmp
+/tmp/
+/.vscode/

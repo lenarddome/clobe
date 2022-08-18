@@ -51,8 +51,6 @@ double prediction(cube discovered, cube predicted) {
   return(prediction);
 }
 
-// weighted euclidean distance
-
 // [[Rcpp::export]]
 List gdistance(arma::cube human, arma::cube model, double universal, double weight,
                arma::colvec frequencies,
