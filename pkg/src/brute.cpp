@@ -7,16 +7,6 @@
 using namespace Rcpp;
 using namespace arma;
 
-// simple function to generate permutations
-arma::mat Permutation(arma::rowvec probabilities) {
-    mat out;
-    std::sort(probabilities.begin(), probabilities.end());
-    do {
-        out.insert_rows(out.n_rows, probabilities);
-    } while ( std::next_permutation(probabilities.begin(), probabilities.end()) );
-    return(out);
-}
-
 // compare two cubes of inequality matrices
 // returns the complete list of unique ordinal matrices
 cube OrdinalCompare(cube discovered, cube predicted) {
@@ -43,15 +33,24 @@ cube OrdinalCompare(cube discovered, cube predicted) {
 
 
 // [[Rcpp::export]]
-Rcpp::List brutes(arma::rowvec probabilities, arma::vec thresholds) {
+Rcpp::List brutes(NumericVector probabilities, int length, arma::vec thresholds) {
 
-    mat permutes = Permutation(probabilities);
+    // Obtaining namespace of RcppAlgos package
+    Environment pkg = Environment::namespace_env("RcppAlgos");
+
+    // Picking up permuteGeneral function from Matrix package
+    Function Permutation = pkg["permuteGeneral"];
+
+    NumericMatrix permutations = Permutation(Named("v", probabilities),
+                                             Named("m", length),
+                                             Named("repetition", true));
+    const mat& permutes = as<mat>(permutations);
 
 
-    cube ordinals(probabilities.n_cols, probabilities.n_cols, 1, fill::zeros);
+    cube ordinals(length, length, 1, fill::zeros);
 
     for (uword i = 0; i < permutes.n_rows; i++) {\
-        cube predictions(probabilities.n_cols, probabilities.n_cols, 1, fill::zeros);
+        cube predictions(length, length, 1, fill::zeros);
 
         mat evaluate = imac(permutes.row(i).as_col(), thresholds);
 
