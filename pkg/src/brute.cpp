@@ -1,7 +1,7 @@
 // Copyright 2022 <Lenard Dome> [legal/copyright]
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
-#include <imac.cpp>
+#include "imac.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -33,7 +33,7 @@ cube OrdinalCompare(cube discovered, cube predicted) {
 
 
 // [[Rcpp::export]]
-Rcpp::List brutes(NumericVector probabilities, int length, arma::vec thresholds) {
+List brutes(NumericVector probabilities, int length, arma::vec thresholds) {
 
     // Obtaining namespace of RcppAlgos package
     Environment pkg = Environment::namespace_env("RcppAlgos");
