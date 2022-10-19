@@ -40,11 +40,10 @@ double prediction(cube discovered, cube predicted) {
     for (int y = 0; y < discovered.n_slices; y++) {
       mat base = discovered.slice(y);
       umat result = (base == current);
-      uvec comparisons = result(trimatu_ind(size(result), 1));
-      index(x, y) =  all(comparisons == 0);
+      index(x, y) =  any(vectorise(result) == 0);
     }
     // if matrix has been found, set value to 1
-    if (all(index.row(x) == 0)) {
+    if (all(index.row(x) == 1)) {
       prediction += 1;
     }
   }
@@ -58,7 +57,7 @@ List gdistance(arma::cube human, arma::cube model, double universal, double weig
   List out;
   vec alpha = accomodation(human, model);
   double alpha_weighted = sum(alpha % frequencies);
-  double beta = prediction(human, model) / universal;
+  double beta = prediction(human, model) / (universal - human.n_slices);
   double distance = sqrt(weight * pow(1 - alpha_weighted, 2) +  (1 - weight) * pow(0 - beta, 2));
   if (xtdo) {
     out = Rcpp::List::create(
