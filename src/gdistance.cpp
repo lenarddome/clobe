@@ -58,6 +58,7 @@ List gdistance(arma::cube human, arma::cube model, double universal, double weig
   vec alpha = accomodation(human, model);
   double alpha_weighted = sum(alpha % frequencies);
   double beta = prediction(human, model) / (universal - human.n_slices);
+  if (!(beta > 0)) beta = 0;
   double distance = sqrt(weight * pow(1 - alpha_weighted, 2) +  (1 - weight) * pow(0 - beta, 2));
   if (xtdo) {
     out = Rcpp::List::create(
