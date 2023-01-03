@@ -54,17 +54,23 @@ double prediction(cube discovered, cube predicted) {
 List gdistance(arma::cube human, arma::cube model, double universal, double weight,
                arma::colvec frequencies,
               bool xtdo = false) {
+
   List out;
+
   vec alpha = accomodation(human, model);
   double alpha_weighted = sum(alpha % frequencies);
+
   double beta = prediction(human, model) / (universal - human.n_slices);
+
   if (!(beta > 0)) beta = 0;
   double distance = sqrt(weight * pow(1 - alpha_weighted, 2) +  (1 - weight) * pow(0 - beta, 2));
+
   if (xtdo) {
     out = Rcpp::List::create(
       Rcpp::Named("gdistance") = distance,
       Rcpp::Named("alpha") = alpha_weighted,
-      Rcpp::Named("beta") = beta);
+      Rcpp::Named("beta") = beta,
+      Rcpp::Named("accomodation") = wrap(find(alpha)));
   } else {
     out = Rcpp::List::create(
       Rcpp::Named("gdistance") = distance);
