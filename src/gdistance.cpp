@@ -52,7 +52,7 @@ double prediction(cube discovered, cube predicted) {
 
 // [[Rcpp::export]]
 List gdistance(arma::cube human, arma::cube model, double universal, double weight,
-               arma::colvec frequencies,
+               arma::colvec frequencies, bool normalize = true,
               bool xtdo = false) {
 
   List out;
@@ -64,6 +64,8 @@ List gdistance(arma::cube human, arma::cube model, double universal, double weig
 
   if (!(beta > 0)) beta = 0;
   double distance = sqrt(weight * pow(1 - alpha_weighted, 2) +  (1 - weight) * pow(0 - beta, 2));
+
+  if(normalize) distance = distance / sqrt(2);
 
   if (xtdo) {
     out = Rcpp::List::create(

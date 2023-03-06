@@ -25,8 +25,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // gdistance
-List gdistance(arma::cube human, arma::cube model, double universal, double weight, arma::colvec frequencies, bool xtdo);
-RcppExport SEXP _clobe_gdistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP xtdoSEXP) {
+List gdistance(arma::cube human, arma::cube model, double universal, double weight, arma::colvec frequencies, bool normalize, bool xtdo);
+RcppExport SEXP _clobe_gdistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP normalizeSEXP, SEXP xtdoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,8 +35,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type universal(universalSEXP);
     Rcpp::traits::input_parameter< double >::type weight(weightSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type frequencies(frequenciesSEXP);
+    Rcpp::traits::input_parameter< bool >::type normalize(normalizeSEXP);
     Rcpp::traits::input_parameter< bool >::type xtdo(xtdoSEXP);
-    rcpp_result_gen = Rcpp::wrap(gdistance(human, model, universal, weight, frequencies, xtdo));
+    rcpp_result_gen = Rcpp::wrap(gdistance(human, model, universal, weight, frequencies, normalize, xtdo));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -55,7 +56,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 3},
-    {"_clobe_gdistance", (DL_FUNC) &_clobe_gdistance, 6},
+    {"_clobe_gdistance", (DL_FUNC) &_clobe_gdistance, 7},
     {"_clobe_imac", (DL_FUNC) &_clobe_imac, 2},
     {NULL, NULL, 0}
 };

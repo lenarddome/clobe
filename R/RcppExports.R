@@ -5,8 +5,8 @@ brutes <- function(probabilities, length, thresholds) {
     .Call(`_clobe_brutes`, probabilities, length, thresholds)
 }
 
-gdistance <- function(human, model, universal, weight, frequencies, xtdo = FALSE) {
-    .Call(`_clobe_gdistance`, human, model, universal, weight, frequencies, xtdo)
+gdistance <- function(human, model, universal, weight, frequencies, normalize = TRUE, xtdo = FALSE) {
+    .Call(`_clobe_gdistance`, human, model, universal, weight, frequencies, normalize, xtdo)
 }
 
 imac <- function(probabilities, thresholds) {
