@@ -51,27 +51,38 @@ double prediction(cube discovered, cube predicted) {
 }
 
 // [[Rcpp::export]]
-List gdistance(arma::cube human, arma::cube model, double universal, double weight,
-               arma::colvec frequencies, bool normalize = true,
-              bool xtdo = false) {
+List gdistance(arma::cube human, arma::cube model, double universal,
+               double weight,
+               arma::colvec frequencies,
+               bool xtdo = false) {
 
+  double alpha_weighted, beta, distance;
+  bool undefined;
   List out;
 
   vec alpha = accomodation(human, model);
-  double alpha_weighted = sum(alpha % frequencies);
+  alpha_weighted = sum(alpha % frequencies);
 
-  double beta = prediction(human, model) / (universal - human.n_slices);
+  // if there are no prediction to be made, set undefined to true
+  undefined = ((universal - human.n_slices) == 0);
 
-  if (!(beta > 0)) beta = 0;
-  double distance = sqrt(weight * pow(1 - alpha_weighted, 2) +  (1 - weight) * pow(0 - beta, 2));
-
-  if(normalize) distance = distance / sqrt(2);
+  if (undefined) {
+    // if human = universal, only calculate accommodation and return warning
+    beta = datum::nan;
+    distance = sqrt(weight * pow(1 - alpha_weighted, 2));
+    Rf_warningcall(R_NilValue, "'beta' cannot be calculated because human = "
+                   "universal, se it was excluded from distance.");
+  } else {
+    beta = prediction(human, model) / (universal - human.n_slices);
+    distance = sqrt(weight * pow(1 - alpha_weighted, 2) + (1 - weight) * pow(beta, 2));
+  }
 
   if (xtdo) {
     out = Rcpp::List::create(
       Rcpp::Named("gdistance") = distance,
       Rcpp::Named("alpha") = alpha_weighted,
       Rcpp::Named("beta") = beta,
+      Rcpp::Named("saturation") = (human.n_slices / universal),
       Rcpp::Named("accomodation") = wrap(find(alpha)));
   } else {
     out = Rcpp::List::create(

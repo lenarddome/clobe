@@ -1,3 +1,7 @@
+library(plyr)
+library(abind)
+library(testthat)
+
 discovered <- array(sample(0:1, size = 60, replace = TRUE), dim = c(3, 3, 20))
 discovered <- alply(discovered, 3,
                     function(x) {y <- x; y[lower.tri(y)] <- 2; return(y)})
@@ -15,7 +19,7 @@ regular <- list('gdistance' = 0.731607431008,
                 'beta' = 0.7)
 
 normal <- gdistance(human = predicted, model = discovered,
-          universal = 20, weight = 0.5, frequencies = matrix(rep(1, 6)/sum(1:6)),
+          universal = 30, weight = 0.5, frequencies = matrix(rep(1, 6)/sum(1:6)),
           xtdo = TRUE)
 
 test_that("gdistance calculation is correct for a simple example", {
@@ -52,4 +56,14 @@ for (i in seq(0, 1, by = .10)) {
 
 test_that("gdistance calculation is correct for weighted gdistance", {
     expect_equal(curve, curvature)
+})
+
+## test warning messages
+
+test_that("gdistance calculation is correct for a simple example", {
+    expect_warning({
+        normal <- gdistance(human = predicted, model = predicted,
+          universal = 6, weight = 0.5, frequencies = matrix(rep(1, 6)/sum(1:6)),
+          xtdo = TRUE)
+          })
 })

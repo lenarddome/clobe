@@ -1,3 +1,5 @@
 library(testthat)
-library(globe)
-test_check("globe")
+library(plyr)
+library(abind)
+library(clobe)
+test_check("clobe")
