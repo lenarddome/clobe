@@ -1,5 +1,11 @@
-# globe
+# clobe
 
-Global Benchmark and Evaluation Toolkit for Formal Computational Models
+Global Benchmark and Evaluation Toolkit for Formal Computational Models.
 
-TODO: Name clashes with existing package on
+Currently incorporates tools used in Dome and Wills (2023).
+
+To install, please use:
+
+```r
+remotes::install_github('lenarddome/clobe')
+```
