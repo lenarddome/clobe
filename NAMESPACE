@@ -1,3 +1,4 @@
 useDynLib(clobe, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
+import(RcppAlgos)
 exportPattern("^[[:alpha:]]+")

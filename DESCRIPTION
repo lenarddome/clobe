@@ -1,18 +1,21 @@
 Package: clobe
 Title: Global Benchmark and Evaluation Tools for Formal Computational Models
-Version: 0.5.7
+Version: 0.6
 Date: 2022-06-12
 Authors@R: c(person("Lenard", "Dome",
                    email = "lenarddome@gmail.com",
-                   role = c("aut", "cre")))
+                   role = c("aut", "cre")),
+             person("Andy Wills", role = c("aut")))
+Author: Lenard Dome [aut, cre], Andy Wills [aut, ctb]
+Maintainer: Lenard Dome <lenarddome@gmail.com>
+Description: Implements the tools used for the comparison of human and model heterogeneity (Dome and Wills, 2023).
 License: GPL (>= 3)
 URL: https://github.com/lenarddome/globe
 BugReports: https://github.com/lenarddome/globe/issues
+Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 1.0.9), RcppAlgos
 LinkingTo: Rcpp, RcppArmadillo
 Encoding: UTF-8
 Suggests:
-    testthat (>= 3.0.0),
-    plyr,
-    abind
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
