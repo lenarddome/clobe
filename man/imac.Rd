@@ -9,63 +9,75 @@
 
 \description{
 
-    Implements the algorithm specified by Dome and Wills (n.d.), which is used
-    to create an inequality matrix - strict upper triangular matrix - describing
-    qualitatively different model and human behaviours (outputs).
+    Implements the method specified by Dome and Wills (2023) used
+    to create an inequality matrix describing ordinal relationships between
+    all the possible combination of stimuli pairs.
 
 }
 
 \usage{
 
-imac(probabilities = NULL, thresholds = c(0.10, -0.10))
+imac(probabilities, thresholds)
 
 }
 \arguments{
 
-  \item{x}{A data.table including the stimuli names and response probabilities. See in \code{details} for more details.}
-  \item{stimuli}{A character vector, including the names of each stimulus that
-      is used in the creation of the inequality matrix.}
+  \item{probabilities}{A numeric vector of dependent measures.}
   \item{thresholds}{A numeric vector with 2 elements, specifying the lower and
       upper bounds of the differences. The first element is the upper, while
-      the lower element is the lower. See \code{Details} below.}
-  \item{midpoint}{Whether to include a midpoint or not.}
+      the second element is the lower bound.}
 
 }
 
 \details{
 
-    Argument \code{x} must have the following columns:
+This function implements a general method for constructing inequality matrices,
+such as the ones used for discretization fo results in Dome and Wills (2023).
+The generic algorithm that constructs those strict upper triangular matrix, \eqn{M = m_{aj}} is
 
-    \itemize{
-        \item{stimulus}{The stimuli as a character, e.g. \code{"AC"}}
-        \item{prob}{Porbability of responding with a single category.}
-    }
-    \code{thresholds = c(upper, lower)} should be set so they specify three
-    intervals: \eqn{(\infty, upper]}, \eqn{(upper, lower)}, \eqn{(lower,  -\infty]}.
+\deqn{M_{a\times j} =
+\left[ {\begin{array}{cccc}
+  * & a_{12} & \cdots & a_{1j}\\
+   * & * & \cdots & a_{2j}\\
+  \vdots & \vdots & \ddots & \vdots\\
+  * & * & * & * \\
+\end{array} } \right].}
+
+Each cell then takes the value output by the following function, where \eqn{a \leq j} and v is the P(rare|stimulus_{a or j}):
+
+
+\deqn{m_{ij} =
+\begin{cases}
+  1, & \text{if } v_i - v_j \leq T \\
+  -1, & \text{if } v_i - v_j \geq T \\
+  0, & \text{otherwise}
+\end{cases}}
+
 
 }
 
 \value{
 
-    Returns a \code{data.frame} with column- and rownames of the stimuli.
-    The ineqaulity matrix can include 1 for a positive difference, -1 for the
-    negative differnce, and 0 for equality (and inconclusive). The matrix also
-    includes \eqn{\empty} as an indifference point.
+    Returns a strict upper triangular matrix, \eqn{M_{aj}} with all ordinal relationships.
+    Each cell, where \eqn{a > j}, can take on one of the following values:
+    0 (approximate equality); 1 (larger); -1 (smaller). It is always rows that
+    are compared to columns. Each cell, where \eqn{a \leq j}, will take on the
+    values of 2.
 
 }
+
 
 \author{
     Lenard Dome
 }
 
 \references{
+
+  Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. https://doi.org/10.31234/osf.io/ygmcj
+
 }
 
 \examples{
-## create a data.table object
-library(data.table)
-dummy <- data.table(stimulus = c("A", "X", "Y", "XY"), prob = c(0.1, 0.5, 0.9, 1))
-
 ## construct ineqaulity matrix
-imac(x = dummy, stimuli = c("X", "Y", "XY"), thresholds = c(0.20, -0.20))
+imac(probabilities = runif(8), thresholds = c(0.10, -0.10))
 }
