@@ -33,7 +33,7 @@ cube OrdinalCompare(cube discovered, cube predicted) {
 
 
 // [[Rcpp::export]]
-List brutes(NumericVector probabilities, int length, arma::vec thresholds) {
+List brutes(NumericVector dependent, int length, arma::vec thresholds) {
 
     // Obtaining namespace of RcppAlgos package
     Environment pkg = Environment::namespace_env("RcppAlgos");
@@ -41,7 +41,7 @@ List brutes(NumericVector probabilities, int length, arma::vec thresholds) {
     // Picking up permuteGeneral function from Matrix package
     Function Permutation = pkg["permuteGeneral"];
 
-    NumericMatrix permutations = Permutation(Named("v", probabilities),
+    NumericMatrix permutations = Permutation(Named("v", dependent),
                                              Named("m", length),
                                              Named("repetition", true));
     const mat& permutes = as<mat>(permutations);
