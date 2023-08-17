@@ -1,6 +1,6 @@
 Package: clobe
 Title: Global Benchmark and Evaluation Tools for Formal Computational Models
-Version: 0.6
+Version: 0.6.0
 Date: 2022-06-12
 Authors@R: c(person("Lenard", "Dome",
                    email = "lenarddome@gmail.com",
@@ -17,5 +17,5 @@ Imports: Rcpp (>= 1.0.9), RcppAlgos
 LinkingTo: Rcpp, RcppArmadillo
 Encoding: UTF-8
 Suggests:
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0), plyr, abind
 Config/testthat/edition: 3
