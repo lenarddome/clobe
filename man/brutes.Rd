@@ -1,10 +1,15 @@
 \name{brutes}
 \alias{brutes}
 \title{brutes}
-\usage{brutes(dependent, length, thresholds)}
+\usage{
+    brutes(dependent, length, thresholds)
+    }
+
 \description{
     A brute-force approach to count the number of possible ineqaulity matrices
-    in the universal set for a given experiment.}
+    in the universal set for a given experiment.
+    }
+
 \arguments{
     \item{dependent}{Numeric vector. All the possible values the dependent variable can take.}
     \item{length}{Integer. The number of independent variables.}
@@ -12,6 +17,7 @@
         upper bounds of the differences. The first element is the upper, while
         the second element is the lower bound.}
 }
+
 \details{
 
 The function implements a brute-forced approach to calculate number of elements

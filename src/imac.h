@@ -1,7 +1,8 @@
-#ifndef PACKAGENAME_ADD_H
-#define PACKAGENAME_ADD_H
+#ifndef IMAC_H
+#define IMAC_H
 
 #include <RcppArmadillo.h>
+
 arma::mat imac(arma::vec probabilities, arma::vec thresholds) ;
 
 #endif

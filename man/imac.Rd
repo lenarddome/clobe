@@ -20,6 +20,7 @@
 imac(probabilities, thresholds)
 
 }
+
 \arguments{
 
   \item{probabilities}{A numeric vector of dependent measures.}
