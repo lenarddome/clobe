@@ -25,13 +25,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // gdistance
-List gdistance(arma::cube human, arma::cube model, double universal, double weight, arma::colvec frequencies, bool xtdo);
+List gdistance(const arma::cube& human, const arma::cube& model, double universal, double weight, arma::colvec frequencies, bool xtdo);
 RcppExport SEXP _clobe_gdistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP xtdoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::cube >::type human(humanSEXP);
-    Rcpp::traits::input_parameter< arma::cube >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type human(humanSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type model(modelSEXP);
     Rcpp::traits::input_parameter< double >::type universal(universalSEXP);
     Rcpp::traits::input_parameter< double >::type weight(weightSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type frequencies(frequenciesSEXP);

@@ -13,7 +13,8 @@
   \item{model}{A 3D array of model-produced inequality matrices.}
   \item{universal}{Integer. The number of theoretically possible patterns.}
   \item{weight}{A double. Specifies how much accommodation and predictions are
-                weighted in calculating g-distance. Default is \code{0.5}.}
+                weighted in calculating g-distance, between 0 and 1. \code{0.5} weights
+                them equally.}
   \item{frequencies}{Vector of doubles. Showing the frequencies as probabilities
                      corresponding to the frequencies observed for the patterns
                      in \code{human}.}
@@ -41,7 +42,8 @@
                 patterns relative to all observed human patterns.}
    \item{beta}{Double. The breadth of model predictions returned as the proportion of
                model predictions and universal. See Note 1.}
-   \item{accommodation}{Vector of indices of accommodated patterns in \code{human}.}
+   \item{accommodation}{Integer vector of the (1-based) indices of accommodated
+                        patterns in \code{human}.}
  
 }
 
