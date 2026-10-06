@@ -1,0 +1,265 @@
+---
+title: "Counting the universal set"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Counting the universal set}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r}
+library(clobe)
+```
+
+To judge whether a model is too flexible, we need to know how many ordinal
+patterns *could* have been observed. This set of all possible patterns is the
+**universal set**, and its size is the `universal` argument of `gdistance()`.
+This vignette explains how to count it. It assumes you know what an
+inequality matrix is; if not, start with `vignette("inequality-matrices")`.
+
+clobe gives three ways to get at the universal set:
+
+| Tool | What it gives | Use it when |
+|---|---|---|
+| `fubini()`, `semiorders()` | the number of patterns, instantly | any pattern could be measured |
+| `orderings()` | every pattern, as matrices | you need the patterns themselves |
+| `brutes()` | the patterns a particular measurement scale can produce | the scale is coarse compared with the threshold |
+
+## Building block: splitting stimuli into groups
+
+How many ways are there to split $n$ stimuli into $k$ groups, where the
+groups have no order and none is empty? This is the **Stirling number of the
+second kind**, $S(n, k)$. For example, 3 stimuli can be split into 2 groups
+in 3 ways: {1, 2}{3}, {1, 3}{2} and {2, 3}{1}.
+
+```{r}
+stirling2(3, 2)
+```
+
+There is a simple way to compute them. Take the last stimulus. Either it is
+in a group of its own, and the other $n - 1$ stimuli form the remaining
+$k - 1$ groups; or it joins one of the $k$ groups formed by the others. So
+
+$$
+S(n, k) = S(n-1, k-1) + k \, S(n-1, k), \qquad S(0, 0) = 1.
+$$
+
+```{r}
+outer(1:6, 1:6, stirling2)
+```
+
+## Weak orderings: the Fubini numbers
+
+With `ordering = "weak"`, only exact ties are "about the same", and a pattern
+is a ranking with ties. To build one, split the $n$ stimuli into $j$ tied
+groups ($S(n, j)$ ways) and rank the groups from top to bottom ($j!$ ways).
+Adding up over the possible numbers of groups gives the **Fubini numbers**
+(also called ordered Bell numbers):
+
+$$
+a(n) = \sum_{j=1}^{n} j! \, S(n, j).
+$$
+
+For 3 stimuli: one group (all tied) in 1 way; two groups in $2! \times 3 = 6$
+ways; three groups (no ties) in $3! = 6$ ways. That makes 13.
+
+```{r}
+fubini(1:8)
+```
+
+If the dependent variable can take fewer distinct values than there are
+stimuli, there cannot be more tied groups than values. `levels` stops the sum
+there:
+
+```{r}
+fubini(4, levels = 3)  # 4 stimuli, but only 3 possible values
+```
+
+## Semiorders
+
+With the default `ordering = "semiorder"`, stimuli within the threshold of
+each other are "about the same", and this relation need not be transitive.
+Counting these patterns takes two steps.
+
+### Step 1: the shape of a semiorder
+
+Ignore for a moment which stimulus is which, and sort the stimuli from
+smallest to largest value. For the stimulus in position $p$, let its **reach**
+$r_p$ be the last position that is still about the same as it. Two rules
+hold:
+
+- $r_p \ge p$, because a stimulus is about the same as itself.
+- $r_1 \le r_2 \le \ldots \le r_n$: if a stimulus is about the same as
+  something further up, then so is every stimulus between them, because
+  their values are closer.
+
+Every such sequence describes a different shape, and every shape has one.
+For 3 stimuli there are 5 shapes:
+
+| $r_1, r_2, r_3$ | meaning |
+|---|---|
+| 1, 2, 3 | all different: $1 < 2 < 3$ |
+| 1, 3, 3 | $1 < 2 \approx 3$ |
+| 2, 2, 3 | $1 \approx 2 < 3$ |
+| 2, 3, 3 | $1 \approx 2$, $2 \approx 3$, but $1 < 3$ |
+| 3, 3, 3 | all about the same |
+
+The number of such sequences for $n$ stimuli is the $n$-th **Catalan
+number**,
+
+$$
+C_n = \frac{1}{n+1} \binom{2n}{n}: \quad 1, 2, 5, 14, 42, 132, \ldots
+$$
+
+which counts many "staircase" structures in mathematics (see Fishburn,
+1985).
+
+### Step 2: labelling the stimuli
+
+A shape becomes a pattern when we decide which stimulus sits in which
+position. There are $n!$ ways to do that, but some give the same pattern:
+if two stimuli are about the same as each other and relate identically to
+everything else, swapping them changes nothing. Removing these duplicates
+gives the number of **labelled semiorders**. There is an exact formula for it,
+derived with generating functions:
+
+$$
+s(n) = \sum_{j=0}^{n} (-1)^{n-j} \, C_j \, j! \, S(n, j).
+$$
+
+Its terms alternate in sign; the subtractions remove the double counting.
+For 3 stimuli:
+
+```{r}
+j <- 0:3
+terms <- (-1)^(3 - j) * choose(2 * j, j) / (j + 1) * factorial(j) *
+  stirling2(3, j)
+terms
+sum(terms)
+```
+
+`semiorders()` computes this, and `orderings()` lists the patterns
+themselves using exactly the two steps above. They agree:
+
+```{r}
+semiorders(1:8)
+orderings(5)$n
+```
+
+### How fast the universal set grows
+
+```{r}
+k <- 1:8
+data.frame(stimuli = k, weak_orderings = fubini(k),
+           semiorders = semiorders(k))
+```
+
+Semiorders outnumber weak orderings, because they also include the
+non-transitive "about the same" chains, and both grow faster than
+exponentially. With 8 stimuli there are over 17 million semiorders.
+
+All counts are stored as ordinary R numbers (doubles), which hold whole
+numbers exactly only up to $2^{53} \approx 9 \times 10^{15}$. The functions
+warn when a result may not be exact: from 17 stimuli for `fubini()` and,
+because of the large alternating terms, from 14 for `semiorders()`.
+
+## When the measurement scale matters
+
+`semiorders(n)` assumes that any values at all could be measured. Real data
+are often coarser: a proportion of 20 trials can only be 0, 0.05, 0.10, and
+so on. Then some semiorders cannot occur. `brutes()` finds out which can, by
+trying every way of assigning the possible values to the stimuli.
+
+For 4 stimuli, a scale of 0, 0.1, ..., 1 with a threshold of 0.1 produces
+every semiorder:
+
+```{r}
+brutes(seq(0, 1, by = 0.1), 4, thresholds = c(0.1, -0.1),
+       return_matrices = FALSE)$n
+semiorders(4)
+```
+
+For 5 stimuli, it does not:
+
+```{r}
+brutes(seq(0, 1, by = 0.1), 5, thresholds = c(0.1, -0.1),
+       return_matrices = FALSE)$n
+semiorders(5)
+```
+
+### Why some patterns are impossible
+
+The problem is not the range of the scale but its *resolution* relative to
+the threshold. When the threshold is exactly one step, any two values are
+either within one step (about the same) or at least two steps apart
+(different); there is nothing in between. Here is a semiorder of 5 stimuli
+that such a scale cannot produce:
+
+```{r}
+pattern <- imac(c(0, 3, 6, 4, 2), thresholds = c(2, -2))
+pattern
+```
+
+Try to realise it with whole-numbered values and a threshold of 1:
+
+- Stimulus 1 is smaller than 2, so they are at least 2 steps apart. Stimulus
+  5 is about the same as both, so it is within 1 step of each. Both can only
+  hold if 2 is exactly 2 steps above 1, with 5 in the middle:
+  $v_2 = v_1 + 2$, $v_5 = v_1 + 1$.
+- In the same way, stimulus 4 is about the same as both 2 and 3, while
+  $2 < 3$, so $v_3 = v_2 + 2$ and $v_4 = v_2 + 1 = v_1 + 3$.
+- But then $v_4 - v_5 = 2$, so 4 and 5 are different, while the pattern says
+  they are about the same.
+
+With a threshold of *two* steps there is room in between, and the values
+$(0, 3, 6, 4, 2)$ above produce the pattern. A wider range of one-step values
+does not help:
+
+```{r}
+brutes(0:20, 5, thresholds = c(1, -1), return_matrices = FALSE)$n
+brutes(0:12, 5, thresholds = c(2, -2), return_matrices = FALSE)$n
+```
+
+So, in practice:
+
+- If the threshold spans several steps of your measurement scale, the
+  universal set is `semiorders(n)` (or `fubini(n)` for weak orderings). You
+  can confirm this with `brutes()`.
+- If the threshold is close to a single step, use `brutes()` with the values
+  your scale can actually produce.
+
+## Computing it
+
+`brutes()` evaluates every assignment of values to stimuli: with $m$ possible
+values and $n$ stimuli, that is $m^n$ assignments. It is written in C++,
+runs on all processor cores (set `threads` to change this), and can be
+interrupted. Even so, $m^n$ grows quickly: 11 values and 8 stimuli is about
+214 million assignments and takes a few seconds; 21 values and 8 stimuli is
+about 38 billion.
+
+Two arguments help with large problems:
+
+- `return_matrices = FALSE` returns only the count. For 8 stimuli, the
+  matrices alone would take several gigabytes of memory.
+- `orderings()` constructs the patterns directly, so its cost depends on the
+  number of patterns rather than on $m^n$. Use it when every pattern can be
+  measured.
+
+```{r, eval = FALSE}
+# count only, on 4 threads
+brutes(seq(0, 1, by = 0.1), 8, thresholds = c(0.1, -0.1),
+       return_matrices = FALSE, threads = 4)
+```
+
+## References
+
+Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and
+human heterogeneity. *Psychological Review, 132*(3), 632-655.
+https://doi.org/10.1037/rev0000550
+
+Fishburn, P. C. (1985). *Interval orders and interval graphs: A study of
+partially ordered sets*. Wiley.
