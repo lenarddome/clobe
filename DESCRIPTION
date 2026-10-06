@@ -5,18 +5,16 @@ Date: 2022-06-12
 Authors@R: c(person("Lenard", "Dome",
                    email = "lenarddome@gmail.com",
                    role = c("aut", "cre")),
-             person("Andy Wills", role = c("aut")))
-Author: Lenard Dome [aut, cre], Andy Wills [aut, ctb]
-Maintainer: Lenard Dome <lenarddome@gmail.com>
+             person("Andy", "Wills", role = c("aut")))
 Description: Implements the tools used for the comparison of human and model heterogeneity (Dome and Wills, 2023).
 License: GPL (>= 3)
-URL: https://github.com/lenarddome/globe
-BugReports: https://github.com/lenarddome/globe/issues
+URL: https://github.com/lenarddome/clobe
+BugReports: https://github.com/lenarddome/clobe/issues
 Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 1.0.9), RcppParallel (>= 5.1.0)
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel
 SystemRequirements: GNU make
 Encoding: UTF-8
 Suggests:
-    testthat (>= 3.0.0), plyr, abind
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3

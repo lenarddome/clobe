@@ -60,13 +60,17 @@ While the major version is 0, breaking changes bump the minor version.
   `frequencies`, `universal >= dim(human)[3]` and `0 <= weight <= 1`.
 - `brutes()` validates `dependent`, `length` and `thresholds`.
 - `gdistance()` documentation no longer claims `weight` defaults to 0.5.
+- Only `brutes()`, `gdistance()` and `imac()` are exported, instead of every
+  object in the package namespace.
 
 ## Removed
 
-- Dependency on RcppAlgos.
+- Dependency on RcppAlgos, and the unused suggested packages plyr and abind.
 
 ## Changed (infrastructure)
 
+- `DESCRIPTION`: point `URL` and `BugReports` to the clobe repository (they
+  pointed to globe) and drop the redundant `Author`/`Maintainer` fields.
 - C++ sources follow the Google C++ Style Guide and are formatted with
   `clang-format` (`.clang-format`: `BasedOnStyle: Google`).
 - CI: update `actions/checkout` to v4.
