@@ -115,3 +115,5 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+# macOS
+.DS_Store
