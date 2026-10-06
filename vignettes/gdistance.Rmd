@@ -1,0 +1,259 @@
+---
+title: "g-distance: accommodation and excess flexibility"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{g-distance: accommodation and excess flexibility}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r}
+library(clobe)
+```
+
+A common way to evaluate a model is to fit it to the average result and see
+how close it gets. But people differ, and a model of human behaviour should
+be able to do what each of them does, without doing much that none of them
+do. g-distance (Dome & Wills, 2025) measures exactly that. This vignette
+defines it step by step, works through an example by hand, and shows how to
+read the result.
+
+## Three sets of patterns
+
+Everything is expressed in terms of ordinal patterns (inequality matrices; see
+`vignette("inequality-matrices")`). We need three sets:
+
+- $H$: the distinct patterns that **h**umans produced, with $f_h$ the
+  proportion of people who produced pattern $h$ (so the $f_h$ add up to 1).
+- $M$: the distinct patterns the **m**odel produces somewhere in its
+  parameter space.
+- $U$: the **u**niversal set, every pattern that could possibly be observed
+  (see `vignette("universal-set")`).
+
+$H$ and $M$ are both parts of $U$. Each set counts a pattern once, however
+often it occurs.
+
+## Accommodation: alpha
+
+**Accommodation** is the proportion of people whose pattern the model can
+produce:
+
+$$
+\alpha = \sum_{h \in H} f_h \times
+\begin{cases} 1 & \text{if } h \in M \\ 0 & \text{otherwise.} \end{cases}
+$$
+
+It runs from 0 (the model produces nobody's pattern) to 1 (it produces
+everybody's). Because it is weighted by $f_h$, missing a pattern that many
+people show costs more than missing a rare one.
+
+## Excess flexibility: beta
+
+A model that produces every possible pattern accommodates everyone, but it
+explains nothing. **Excess flexibility** is the proportion of the patterns
+that *nobody* produced that the model produces anyway:
+
+$$
+\beta = \frac{|M \setminus H|}{|U| - |H|},
+$$
+
+where $|M \setminus H|$ is the number of model patterns not observed in
+humans, and $|U| - |H|$ is the number of possible patterns not observed in
+humans. It runs from 0 (the model predicts nothing beyond what was observed)
+to 1 (it predicts every unobserved pattern).
+
+## Combining them: g-distance
+
+The ideal model has $\alpha = 1$ and $\beta = 0$: it produces every observed
+pattern and nothing else. g-distance is how far a model is from that ideal:
+
+$$
+g = \sqrt{\, w (1 - \alpha)^2 + (1 - w) \beta^2 \,}.
+$$
+
+This is the ordinary (Pythagorean) distance between the point
+$(1 - \alpha, \beta)$ and the ideal point $(0, 0)$, with the two directions
+weighted by $w$ and $1 - w$. It runs from 0 (ideal) to 1. Lower is better.
+
+The **weight** $w$ says how much you care about missing human behaviour
+compared with producing behaviour nobody showed. With $w = 0.5$, both count
+equally. A larger $w$ penalises missed participants more; a smaller $w$
+penalises flexibility more.
+
+## A worked example
+
+Three stimuli, four participants. Two produce the same pattern (A), and one
+each produces B and C. The model produces A and B, and two patterns nobody
+showed (D and E).
+
+```{r}
+thresholds <- c(0.1, -0.1)
+people <- rbind(c(0.9, 0.5, 0.1),   # A: 1 > 2 > 3
+                c(0.8, 0.5, 0.2),   # A again
+                c(0.1, 0.5, 0.9),   # B: 1 < 2 < 3
+                c(0.5, 0.5, 0.5))   # C: all about the same
+model <- rbind(c(0.9, 0.5, 0.1),    # A
+               c(0.1, 0.5, 0.9),    # B
+               c(0.9, 0.9, 0.1),    # D: 1 = 2 > 3
+               c(0.1, 0.9, 0.9))    # E: 1 < 2 = 3
+
+human <- patterns(people, thresholds)
+model <- patterns(model, thresholds)
+human$frequencies
+```
+
+By hand:
+
+- $\alpha$: A (half of the people) and B (a quarter) are accommodated, C is
+  not: $\alpha = 0.5 + 0.25 = 0.75$.
+- $\beta$: there are 19 possible patterns of 3 stimuli (`semiorders(3)`),
+  and people showed 3 of them, leaving 16. The model produces 2 of those 16
+  (D and E): $\beta = 2 / 16 = 0.125$.
+- $g = \sqrt{0.5 \times 0.25^2 + 0.5 \times 0.125^2} \approx 0.198$.
+
+And with clobe:
+
+```{r}
+gdistance(human$inequality_matrices, model$inequality_matrices,
+          universal = semiorders(3), weight = 0.5,
+          frequencies = human$frequencies, xtdo = TRUE)
+```
+
+`accommodation` lists which human patterns (by their position in
+`human$inequality_matrices`) the model produces.
+
+## Comparing models
+
+Here are three models of the four-stimulus experiment from
+`vignette("clobe")`: one that can only produce monotonic changes, one that
+can also produce U-shapes, and one that produces random probabilities and so
+can do almost anything.
+
+```{r}
+set.seed(2025)
+x <- c(-1.5, -0.5, 0.5, 1.5)
+slopes <- rnorm(40, mean = 0.5, sd = 1)
+human <- patterns(t(sapply(slopes, function(b) {
+  rbinom(4, size = 20, prob = plogis(b * x + rnorm(4, sd = 0.3))) / 20
+})), thresholds)
+
+grid <- seq(-3, 3, by = 0.1)
+theta <- as.matrix(expand.grid(b = grid, c = grid))
+models <- list(
+  linear = t(sapply(grid, function(b) plogis(b * x))),
+  quadratic = t(apply(theta, 1, function(t) {
+    plogis(t[["b"]] * x + t[["c"]] * x^2)
+  })),
+  random = matrix(runif(4 * 2000), ncol = 4)
+)
+
+scores <- t(sapply(models, function(m) {
+  out <- gdistance(human$inequality_matrices,
+                   patterns(m, thresholds)$inequality_matrices,
+                   universal = semiorders(4), weight = 0.5,
+                   frequencies = human$frequencies, xtdo = TRUE)
+  c(alpha = out$alpha, beta = out$beta, g = out$gdistance)
+}))
+round(scores, 3)
+```
+
+Plotting each model at $(1 - \alpha, \beta)$ shows the trade-off. The ideal
+model sits in the bottom-left corner; the dashed arcs join points with the
+same g-distance (for $w = 0.5$).
+
+```{r, fig.width = 5.5, fig.height = 5.5, fig.alt = "Scatter plot of three models by missed human behaviour (1 minus alpha) and excess flexibility (beta), with arcs of equal g-distance around the ideal point at the origin."}
+colours <- c(linear = "#2a78d6", quadratic = "#eb6834", random = "#1baf7a")
+shapes <- c(linear = 16, quadratic = 17, random = 15)
+ink <- "#3b3b3b"
+
+par(mar = c(4.5, 4.5, 3, 1), col.axis = ink, col.lab = ink, col.main = ink,
+    fg = "#9b9b96", las = 1)
+plot(NA, xlim = c(-0.02, 1.02), ylim = c(-0.02, 1.02), asp = 1,
+     xlab = expression("Missed human behaviour, " * 1 - alpha),
+     ylab = expression("Excess flexibility, " * beta),
+     main = "Distance from the ideal model")
+angle <- seq(0, pi / 2, length.out = 100)
+for (g in c(0.25, 0.5, 0.75)) {
+  # with w = 0.5, g is the distance scaled by sqrt(0.5)
+  lines(g * sqrt(2) * cos(angle), g * sqrt(2) * sin(angle),
+        lty = 2, col = "#d6d5cf")
+  text(g * sqrt(2) * cos(pi / 4), g * sqrt(2) * sin(pi / 4),
+       paste("g =", g), col = "#8a8984", cex = 0.75, pos = 4)
+}
+points(0, 0, pch = 4, cex = 1.6, lwd = 2, col = ink)
+text(0, 0, "ideal", pos = 4, offset = 0.6, col = ink, cex = 0.85)
+points(1 - scores[, "alpha"], scores[, "beta"], pch = shapes,
+       col = colours, cex = 1.8)
+text(1 - scores[, "alpha"], scores[, "beta"], rownames(scores), pos = 3,
+     offset = 0.8, col = ink, cex = 0.9)
+legend("topright", legend = names(colours), pch = shapes, col = colours,
+       pt.cex = 1.5, bty = "n", text.col = ink)
+```
+
+- The **linear** model hardly produces anything nobody did
+  ($\beta$ = `r round(scores["linear", "beta"], 2)`), but it accommodates only
+  `r round(100 * scores["linear", "alpha"])`% of people, because it cannot
+  produce their patterns.
+- The **random** model accommodates
+  `r round(100 * scores["random", "alpha"])`% of people, but only because it
+  also produces most of the patterns nobody showed
+  ($\beta$ = `r round(scores["random", "beta"], 2)`).
+- The **quadratic** model lies between them. Here it is the
+  `r if (rownames(scores)[which.min(scores[, "g"])] == "quadratic") "closest to the ideal" else "a compromise"`.
+
+g-distance rewards models that are flexible in the *same way* people are,
+not simply more or less flexible.
+
+## Things to know
+
+- **Patterns are counted once.** If the model produces a pattern at many
+  parameter settings, it still counts once in $M$. The same holds for $H$;
+  use `patterns()` to get the distinct human patterns with their frequencies.
+- **Only the upper triangle matters.** Two matrices are the same pattern if
+  their cells above the diagonal agree.
+- **When people show every possible pattern**, $|U| - |H| = 0$ and $\beta$
+  cannot be computed. `gdistance()` then warns, sets `beta` to `NaN` and
+  uses accommodation alone.
+- **The universal set must match how patterns were built**: the same
+  thresholds, the same `ordering`, and a measurement scale that can produce
+  them. `vignette("universal-set")` explains how to get it right.
+
+## Near misses
+
+$\alpha$ treats a missed pattern as missed, however close the model came.
+`pattern_distance()` tells you how close that was. Its default, the
+Kemeny-Snell distance, adds 1 for every pair of stimuli that is ordered in
+one pattern and about the same in the other, and 2 for every pair whose order
+is reversed:
+
+$$
+d(a, b) = \sum_{i < j} |a_{ij} - b_{ij}|.
+$$
+
+In the worked example, the model missed pattern C (all three stimuli about
+the same). How close did it get?
+
+```{r}
+human <- patterns(people, thresholds)
+model <- patterns(rbind(c(0.9, 0.5, 0.1), c(0.1, 0.5, 0.9),
+                        c(0.9, 0.9, 0.1), c(0.1, 0.9, 0.9)), thresholds)
+distances <- pattern_distance(human$inequality_matrices,
+                              model$inequality_matrices)
+distances
+apply(distances, 1, min)
+```
+
+Each row is a human pattern and each column a model pattern. A and B are
+matched exactly (distance 0). The closest the model comes to C is a
+distance of 2: patterns D and E each tie two of the stimuli, as C does, but
+separate the third.
+
+## Reference
+
+Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and
+human heterogeneity. *Psychological Review, 132*(3), 632-655.
+https://doi.org/10.1037/rev0000550
