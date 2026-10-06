@@ -17,14 +17,27 @@ While the major version is 0, breaking changes bump the minor version.
   has `length(dependent)^length` rows; use `return_permutations = TRUE`.
 - `brutes()` returns the unique inequality matrices sorted by pattern rather
   than in order of discovery.
+- `imac()` treats a difference exactly equal to a threshold as approximately
+  equal (it was classified as larger or smaller, apart from rounding errors).
+  Together with the tolerance fix below, this keeps the previous results of
+  `brutes()` for 11 equally spaced values and thresholds of one step (19 and
+  183 patterns for 3 and 4 stimuli), which are now computed consistently
+  rather than by accident of rounding.
+
+## Added
+
+- `ordering` argument to `imac()` and `brutes()`: `"semiorder"` (default)
+  treats differences within the thresholds as approximately equal; `"weak"`
+  treats only ties as approximately equal, giving weak orderings, which
+  `brutes()` counts as the Fubini numbers.
+- `return_permutations` argument to `brutes()`.
 
 ## Fixed
 
 - `imac()` compared differences against the thresholds without a tolerance, so
   equal steps were classified inconsistently (e.g. `0.3 - 0.2` is `0.0999...`
-  and was treated as approximately equal, while `0.2 - 0.1` was not). This
-  changes the results of `brutes()` for the documented example: the universal
-  set for 11 equally spaced values and 4 stimuli is 75, not 183.
+  and was treated as approximately equal, while `0.2 - 0.1` was not).
+  Differences are now compared with a tolerance of `sqrt(.Machine$double.eps)`.
 - `imac()` returned wrong cells (e.g. `4` or `2`) when the dependent measure
   spans 2 or more, because `2` was also used to mark the lower triangle.
 - `gdistance()` compared patterns on the upper triangle when computing

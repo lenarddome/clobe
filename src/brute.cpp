@@ -110,10 +110,12 @@ cube unique_matrices(const std::vector<int>& classes, std::size_t m,
 
 // [[Rcpp::export]]
 List brutes(NumericVector dependent, int length, arma::vec thresholds,
+            std::string ordering = "semiorder",
             bool return_permutations = false) {
   if (dependent.size() == 0) stop("'dependent' must not be empty.");
   if (length < 1) stop("'length' must be at least 1.");
   imac_check_thresholds(thresholds);
+  const bool weak = imac_is_weak(ordering);
 
   const std::size_t m = dependent.size();
   const std::size_t k = length;
@@ -128,7 +130,7 @@ List brutes(NumericVector dependent, int length, arma::vec thresholds,
   for (std::size_t a = 0; a < m; a++) {
     for (std::size_t b = 0; b < m; b++) {
       classes[a * m + b] = imac_classify(dependent[a] - dependent[b],
-                                         thresholds[0], thresholds[1]);
+                                         thresholds[0], thresholds[1], weak);
     }
   }
 

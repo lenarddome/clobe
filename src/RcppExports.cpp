@@ -12,16 +12,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // brutes
-List brutes(NumericVector dependent, int length, arma::vec thresholds, bool return_permutations);
-RcppExport SEXP _clobe_brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP return_permutationsSEXP) {
+List brutes(NumericVector dependent, int length, arma::vec thresholds, std::string ordering, bool return_permutations);
+RcppExport SEXP _clobe_brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP, SEXP return_permutationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type dependent(dependentSEXP);
     Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type ordering(orderingSEXP);
     Rcpp::traits::input_parameter< bool >::type return_permutations(return_permutationsSEXP);
-    rcpp_result_gen = Rcpp::wrap(brutes(dependent, length, thresholds, return_permutations));
+    rcpp_result_gen = Rcpp::wrap(brutes(dependent, length, thresholds, ordering, return_permutations));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -42,22 +43,23 @@ BEGIN_RCPP
 END_RCPP
 }
 // imac
-arma::mat imac(arma::vec probabilities, arma::vec thresholds);
-RcppExport SEXP _clobe_imac(SEXP probabilitiesSEXP, SEXP thresholdsSEXP) {
+arma::mat imac(arma::vec probabilities, arma::vec thresholds, std::string ordering);
+RcppExport SEXP _clobe_imac(SEXP probabilitiesSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type probabilities(probabilitiesSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
-    rcpp_result_gen = Rcpp::wrap(imac(probabilities, thresholds));
+    Rcpp::traits::input_parameter< std::string >::type ordering(orderingSEXP);
+    rcpp_result_gen = Rcpp::wrap(imac(probabilities, thresholds, ordering));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 4},
+    {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 5},
     {"_clobe_gdistance", (DL_FUNC) &_clobe_gdistance, 6},
-    {"_clobe_imac", (DL_FUNC) &_clobe_imac, 2},
+    {"_clobe_imac", (DL_FUNC) &_clobe_imac, 3},
     {NULL, NULL, 0}
 };
 

@@ -1,10 +1,10 @@
-# with 11 equally spaced values and thresholds of one step, only exact ties
-# are approximately equal, so the universal set is every weak ordering of the
-# stimuli: the Fubini numbers 1, 3, 13, 75, 541
-results <- c(1, 3, 13, 75, 541)
+# with 11 equally spaced values and thresholds of one step, neighbouring
+# values are approximately equal; for up to 4 stimuli, every semiorder can be
+# realised, giving the number of labelled semiorders: 1, 3, 19, 183
+results <- c(1, 3, 19, 183)
 
 combinatorics <- NULL
-for (i in seq(5)) {
+for (i in seq(4)) {
    out <- brutes(dependent = seq(0, 1, by = 0.10), length = i,
                  thresholds = c(0.10, -0.10))
    combinatorics <- c(combinatorics, out$n)
@@ -14,20 +14,34 @@ test_that("brutes reproduce a quick calculation", {
     expect_equal(combinatorics, results)
 })
 
+test_that("weak ordering gives the Fubini numbers", {
+    # only ties are approximately equal, so every weak ordering is a pattern
+    fubini <- sapply(seq(5), function(i) {
+        brutes(dependent = seq(0, 1, by = 0.10), length = i,
+               thresholds = c(0.10, -0.10), ordering = "weak")$n
+    })
+    expect_equal(fubini, c(1, 3, 13, 75, 541))
+    # with fewer values than stimuli, at most 3 tied groups: 1 + 14 + 36
+    expect_equal(brutes(0:2, 4, c(0.5, -0.5), ordering = "weak")$n, 51)
+})
+
 test_that("brutes agree with an exact computation on integers", {
     # integers have no rounding error, so this is an independent reference
-    reference <- function(dependent, length, thresholds) {
+    reference <- function(dependent, length, thresholds, ordering) {
         grid <- as.matrix(expand.grid(rep(list(dependent), length)))
         keys <- apply(grid, 1, function(row) {
-            out <- imac(row, thresholds)
+            out <- imac(row, thresholds, ordering)
             paste(out[upper.tri(out)], collapse = ",")
         })
         length(unique(keys))
     }
-    for (k in 2:4) {
-        exact <- reference(0:4, k, c(2, -2))
-        expect_equal(brutes(0:4, k, c(2, -2))$n, exact)
-        expect_equal(brutes(seq(0, 0.4, by = 0.1), k, c(0.2, -0.2))$n, exact)
+    for (ordering in c("semiorder", "weak")) {
+        for (k in 2:4) {
+            exact <- reference(0:4, k, c(2, -2), ordering)
+            expect_equal(brutes(0:4, k, c(2, -2), ordering)$n, exact)
+            expect_equal(brutes(seq(0, 0.4, by = 0.1), k, c(0.2, -0.2),
+                                ordering)$n, exact)
+        }
     }
 })
 
@@ -61,6 +75,8 @@ test_that("brutes rejects invalid input", {
     expect_error(brutes(seq(0, 1, by = 0.1), 0, c(0.1, -0.1)), "length")
     expect_error(brutes(numeric(0), 2, c(0.1, -0.1)), "dependent")
     expect_error(brutes(seq(0, 1, by = 0.1), 2, 0.1), "thresholds")
+    expect_error(brutes(seq(0, 1, by = 0.1), 2, c(0.1, -0.1), "total"),
+                 "ordering")
     expect_error(brutes(seq(0, 1, length.out = 1000), 10, c(0.1, -0.1)),
                  "too many")
 })
