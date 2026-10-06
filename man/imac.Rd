@@ -9,7 +9,7 @@
 
 \description{
 
-    Implements the method specified by Dome and Wills (2023) used
+    Implements the method specified by Dome and Wills (2025) used
     to create an inequality matrix describing ordinal relationships between
     all the possible combination of stimuli pairs.
 
@@ -36,7 +36,7 @@ imac(probabilities, thresholds, ordering = "semiorder")
 \details{
 
 This function implements a general method for constructing inequality matrices,
-such as the ones used for discretization of results in Dome and Wills (2023).
+such as the ones used for discretization of results in Dome and Wills (2025).
 The generic algorithm constructs a strict upper triangular matrix,
 \eqn{M = (m_{ij})}, for \eqn{n} stimuli,
 
@@ -92,7 +92,7 @@ classification.
 
 \references{
 
-  Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. https://doi.org/10.31234/osf.io/ygmcj
+  Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and human heterogeneity. Psychological Review, 132(3), 632-655. https://doi.org/10.1037/rev0000550
 
 }
 

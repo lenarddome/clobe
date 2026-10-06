@@ -2,7 +2,7 @@
 \alias{gdistance}
 \title{g-distance}
 \description{
-  This function implements g-distance as specified in Dome and Wills (2023)
+  This function implements g-distance as specified in Dome and Wills (2025)
   suitable for lists of inequality matrices.
 }
 \usage{ 
@@ -24,7 +24,7 @@
 \details{
 
   The function implements g-distance for the comparison of formal computational
-  models as described by Dome and Wills (2023). The general form of g-distance
+  models as described by Dome and Wills (2025). The general form of g-distance
   is as:
 
    \deqn{ g = \sqrt{ w(1 - \alpha)^2 + (1-w)\beta^2 } .}
@@ -32,7 +32,7 @@
    Two inequality matrices are the same pattern if their strict upper
    triangles are identical (see \code{\link{imac}}).
 
-   For a more thorough overview of the method, see Dome and Wills (2023).
+   For a more thorough overview of the method, see Dome and Wills (2025).
 
 }
 
@@ -56,7 +56,7 @@
 
 \references{
 
-  Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. https://doi.org/10.31234/osf.io/ygmcj
+  Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and human heterogeneity. Psychological Review, 132(3), 632-655. https://doi.org/10.1037/rev0000550
 
 }
 

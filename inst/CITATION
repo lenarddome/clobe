@@ -1,12 +1,16 @@
 bibentry(
-  bibtype = "Misc",
-  title = "g-distance: On the comparison of model and human heterogeneity",
-  author = c(person("Lenard", "Dome"), person("Andy", "Wills")),
-  year = "2023",
-  howpublished = "PsyArXiv",
-  doi = "10.31234/osf.io/ygmcj",
+  bibtype = "Article",
+  title = "g-Distance: On the comparison of model and human heterogeneity",
+  author = c(person("Lenard", "Dome"), person(c("Andy", "J."), "Wills")),
+  journal = "Psychological Review",
+  year = "2025",
+  volume = "132",
+  number = "3",
+  pages = "632--655",
+  doi = "10.1037/rev0000550",
   textVersion = paste(
-    "Dome, L., & Wills, A. (2023). g-distance: On the comparison of model",
-    "and human heterogeneity. PsyArXiv. https://doi.org/10.31234/osf.io/ygmcj"
+    "Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model",
+    "and human heterogeneity. Psychological Review, 132(3), 632-655.",
+    "https://doi.org/10.1037/rev0000550"
   )
 )

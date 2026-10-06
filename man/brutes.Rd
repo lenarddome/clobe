@@ -31,7 +31,7 @@
 
 The function implements a brute-forced approach to calculate number of elements
 in the universal set - the number of possible discretized results observable in
-a given experiment (Dome and Wills, 2023). It applies \code{\link{imac}} to
+a given experiment (Dome and Wills, 2025). It applies \code{\link{imac}} to
 every assignment of \code{dependent} values to the \code{length} stimuli and
 keeps the unique inequality matrices.
 
@@ -68,7 +68,7 @@ Returns the following list of elements:
 
 \references{
 
-  Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. https://doi.org/10.31234/osf.io/ygmcj
+  Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and human heterogeneity. Psychological Review, 132(3), 632-655. https://doi.org/10.1037/rev0000550
 
 }
 

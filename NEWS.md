@@ -71,6 +71,8 @@ While the major version is 0, breaking changes bump the minor version.
 
 - Fix the `gdistance()` formula (beta is squared), the `imac()` formula and
   value description, and typos.
+- Cite the published version of Dome and Wills (2025), Psychological Review,
+  <doi:10.1037/rev0000550>, instead of the 2023 preprint.
 - Add examples to `brutes()` and `gdistance()`, a usage section to the README,
   and `inst/CITATION` so that `citation("clobe")` works as documented.
 

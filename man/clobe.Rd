@@ -11,7 +11,7 @@
     
         Provides tools for the qualitative evaluation of formal computational models.
         Currently incorporates tools used in comparing model and human heterogeneity,
-        see Dome and Wills (2023) <doi:10.31234/osf.io/ygmcj>.
+        see Dome and Wills (2025) <doi:10.1037/rev0000550>.
 
 Please cite the package in publications. Use \code{citation("clobe")}.
 
@@ -32,6 +32,6 @@ Please cite the package in publications. Use \code{citation("clobe")}.
 
 \references{
 
-    Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. PsyArXiv. https://doi.org/10.31234/osf.io/ygmcj
+    Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and human heterogeneity. Psychological Review, 132(3), 632-655. https://doi.org/10.1037/rev0000550
 
 }
