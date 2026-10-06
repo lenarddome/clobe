@@ -22,6 +22,10 @@ Breaking changes are marked **Breaking**.
 - `return_matrices` argument to `brutes()`: with `FALSE`, only the number of
   patterns is returned. For 8 stimuli, this halves the running time and avoids
   returning an array of about 3.7 GB.
+- `stirling2()`, `fubini()` and `semiorders()` count ordinal patterns without
+  enumerating them: Stirling numbers of the second kind, weak orderings
+  (optionally with a limited number of tied groups) and labelled semiorders.
+  They warn when a count exceeds 2^53 and may not be exact.
 - `inst/CITATION`, so that `citation("clobe")` works as documented.
 - Examples for `brutes()` and `gdistance()`, and a usage section in the README.
 - `.clang-format` file; the C++ sources follow the Google C++ Style Guide.
