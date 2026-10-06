@@ -65,7 +65,8 @@
 }
 
 \seealso{
-  \code{\link{imac}}, \code{\link{brutes}}, \code{\link{pattern_distance}}
+  \code{\link{imac}}, \code{\link{brutes}}, \code{\link{patterns}},
+  \code{\link{pattern_distance}}
 }
 
 \examples{

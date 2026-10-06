@@ -33,6 +33,9 @@ Breaking changes are marked **Breaking**.
 - `pattern_distance()` measures the distance between inequality matrices,
   either as the Kemeny-Snell distance, where a reversed pair counts twice as
   much as a tied one, or as the number of pairs that differ.
+- `patterns()` turns results, one row per participant or model run, into the
+  unique inequality matrices with their counts and frequencies, ready for
+  `gdistance()`.
 - `inst/CITATION`, so that `citation("clobe")` works as documented.
 - Examples for `brutes()` and `gdistance()`, and a usage section in the README.
 - `.clang-format` file; the C++ sources follow the Google C++ Style Guide.
