@@ -3,7 +3,7 @@
 \title{brutes}
 \usage{
     brutes(dependent, length, thresholds, ordering = "semiorder",
-           return_permutations = FALSE)
+           return_permutations = FALSE, threads = -1L)
     }
 
 \description{
@@ -22,6 +22,9 @@
     \item{return_permutations}{Logical. Whether to return every assignment of
         \code{dependent} values to the stimuli. Default is \code{FALSE}, as
         there are \code{length(dependent)^length} of them.}
+    \item{threads}{Integer. The number of threads to use. The default,
+        \code{-1L}, uses the number set by
+        \code{RcppParallel::setThreadOptions()}, or else all available cores.}
 }
 
 \details{
@@ -40,7 +43,9 @@ number of labelled semiorders on \code{length} elements (1, 3, 19, 183, 2371,
 to the thresholds to realise every semiorder.
 
 The number of assignments grows as \code{length(dependent)^length}, so the
-running time does too.
+running time does too. The assignments are split between \code{threads}
+threads, and the computation can be interrupted. The result does not depend on
+the number of threads.
 
 }
 \value{

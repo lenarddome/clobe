@@ -30,6 +30,9 @@ While the major version is 0, breaking changes bump the minor version.
   treats differences within the thresholds as approximately equal; `"weak"`
   treats only ties as approximately equal, giving weak orderings, which
   `brutes()` counts as the Fubini numbers.
+- `brutes()` runs in parallel using RcppParallel, on all available cores by
+  default; set the number of threads with the new `threads` argument or
+  `RcppParallel::setThreadOptions()`. It can now be interrupted.
 - `return_permutations` argument to `brutes()`.
 
 ## Fixed

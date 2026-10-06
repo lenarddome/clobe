@@ -86,3 +86,15 @@ test_that("brutes handles more than 40 cells per matrix", {
     # split into two tied groups: 1 + 2^10 - 2
     expect_equal(brutes(c(0, 1), 10, c(0.5, -0.5))$n, 1023)
 })
+
+test_that("brutes gives the same result on one or several threads", {
+    for (ordering in c("semiorder", "weak")) {
+        one <- brutes(seq(0, 1, by = 0.1), 5, c(0.1, -0.1), ordering,
+                      threads = 1)
+        several <- brutes(seq(0, 1, by = 0.1), 5, c(0.1, -0.1), ordering,
+                          threads = 4)
+        expect_identical(several, one)
+    }
+    expect_error(brutes(seq(0, 1, by = 0.1), 2, c(0.1, -0.1), threads = 0),
+                 "threads")
+})
