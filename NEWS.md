@@ -13,6 +13,10 @@ While the major version is 0, breaking changes bump the minor version.
 - `gdistance(xtdo = TRUE)` returns the accommodated patterns as
   `accommodation` (was misspelled `accomodation`), as 1-based indices into
   `human` (were 0-based), in a plain integer vector (was a one-column matrix).
+- `brutes()` no longer returns the matrix of permutations by default, as it
+  has `length(dependent)^length` rows; use `return_permutations = TRUE`.
+- `brutes()` returns the unique inequality matrices sorted by pattern rather
+  than in order of discovery.
 
 ## Fixed
 
@@ -31,10 +35,21 @@ While the major version is 0, breaking changes bump the minor version.
 
 ## Changed
 
+- `brutes()` is much faster: matrices are deduplicated with a hash set instead
+  of being compared against every matrix found so far, and permutations are
+  generated on the fly instead of being stored. For 11 values and 5 stimuli
+  it takes milliseconds instead of ~23 seconds.
 - `imac()` now errors if `thresholds` is not `c(upper, lower)`.
 - `gdistance()` now validates its input: matrix dimensions, the length of
   `frequencies`, `universal >= dim(human)[3]` and `0 <= weight <= 1`.
+- `brutes()` validates `dependent`, `length` and `thresholds`.
 - `gdistance()` documentation no longer claims `weight` defaults to 0.5.
+
+## Removed
+
+- Dependency on RcppAlgos.
+
+## Changed (infrastructure)
 
 - CI: update `actions/checkout` to v4.
 - Ignore macOS `.DS_Store` files.

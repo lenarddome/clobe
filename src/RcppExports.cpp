@@ -12,15 +12,16 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // brutes
-List brutes(NumericVector dependent, int length, arma::vec thresholds);
-RcppExport SEXP _clobe_brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP) {
+List brutes(NumericVector dependent, int length, arma::vec thresholds, bool return_permutations);
+RcppExport SEXP _clobe_brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP return_permutationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type dependent(dependentSEXP);
     Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
-    rcpp_result_gen = Rcpp::wrap(brutes(dependent, length, thresholds));
+    Rcpp::traits::input_parameter< bool >::type return_permutations(return_permutationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(brutes(dependent, length, thresholds, return_permutations));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -54,7 +55,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 3},
+    {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 4},
     {"_clobe_gdistance", (DL_FUNC) &_clobe_gdistance, 6},
     {"_clobe_imac", (DL_FUNC) &_clobe_imac, 2},
     {NULL, NULL, 0}

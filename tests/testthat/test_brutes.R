@@ -30,3 +30,43 @@ test_that("brutes agree with an exact computation on integers", {
         expect_equal(brutes(seq(0, 0.4, by = 0.1), k, c(0.2, -0.2))$n, exact)
     }
 })
+
+test_that("brutes returns each unique inequality matrix once", {
+    out <- brutes(seq(0, 1, by = 0.25), 3, c(0.10, -0.10))
+    keys <- apply(out$inequality_matrices, 3,
+                  function(m) paste(m[upper.tri(m)], collapse = ","))
+    expect_equal(dim(out$inequality_matrices), c(3, 3, out$n))
+    expect_false(any(duplicated(keys)))
+    m <- out$inequality_matrices[, , 1]
+    expect_true(all(m[lower.tri(m, diag = TRUE)] == 2))
+})
+
+test_that("permutations are only returned on request, in the documented order", {
+    dependent <- c(0.3, 0.1, 0.2)
+    expect_null(brutes(dependent, 2, c(0.1, -0.1))$permutations)
+    out <- brutes(dependent, 2, c(0.1, -0.1), return_permutations = TRUE)
+    # every combination, with the last column changing fastest
+    expected <- as.matrix(rev(expand.grid(rep(list(dependent), 2))))
+    dimnames(expected) <- NULL
+    expect_equal(out$permutations, expected)
+})
+
+test_that("brutes handles a single stimulus", {
+    out <- brutes(seq(0, 1, by = 0.1), 1, c(0.1, -0.1))
+    expect_equal(out$n, 1)
+    expect_equal(dim(out$inequality_matrices), c(1, 1, 1))
+})
+
+test_that("brutes rejects invalid input", {
+    expect_error(brutes(seq(0, 1, by = 0.1), 0, c(0.1, -0.1)), "length")
+    expect_error(brutes(numeric(0), 2, c(0.1, -0.1)), "dependent")
+    expect_error(brutes(seq(0, 1, by = 0.1), 2, 0.1), "thresholds")
+    expect_error(brutes(seq(0, 1, length.out = 1000), 10, c(0.1, -0.1)),
+                 "too many")
+})
+
+test_that("brutes handles more than 40 cells per matrix", {
+    # 10 stimuli have 45 cells; with 2 values, the patterns are all ties or a
+    # split into two tied groups: 1 + 2^10 - 2
+    expect_equal(brutes(c(0, 1), 10, c(0.5, -0.5))$n, 1023)
+})
