@@ -9,6 +9,8 @@ Breaking changes are marked **Breaking**.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-06
+
 ### Added
 
 - `ordering` argument to `imac()` and `brutes()`: `"semiorder"` (the default)
@@ -107,5 +109,6 @@ Breaking changes are marked **Breaking**.
 
 Last version before this changelog was kept.
 
-[Unreleased]: https://github.com/lenarddome/clobe/compare/v0.6-beta...HEAD
+[Unreleased]: https://github.com/lenarddome/clobe/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/lenarddome/clobe/compare/v0.6-beta...v0.7.0
 [0.6.0]: https://github.com/lenarddome/clobe/releases/tag/v0.6-beta
