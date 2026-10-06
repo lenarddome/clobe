@@ -12,3 +12,4 @@
 ^.vscode/
 ^LICENSE\.md$
 ^\.clang-format$
+^CHANGELOG\.md$
