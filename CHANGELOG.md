@@ -9,6 +9,13 @@ Breaking changes are marked **Breaking**.
 
 ## [Unreleased]
 
+### Added
+
+- Vignettes that explain the methods and their mathematics: getting started
+  (`vignette("clobe")`), inequality matrices, semiorders and weak orderings
+  (`vignette("inequality-matrices")`), counting the universal set
+  (`vignette("universal-set")`), and g-distance (`vignette("gdistance")`).
+
 ## [0.7.0] - 2026-10-06
 
 ### Added

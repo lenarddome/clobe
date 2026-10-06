@@ -49,7 +49,18 @@ To work with the universal set:
   to realise every semiorder.
 - `pattern_distance()` measures how far apart two patterns are.
 
-See the help page of each function for details.
+See the help page of each function for details, and the vignettes for
+explanations of the methods and their mathematics:
+
+- `vignette("clobe")`: getting started, from raw data to g-distance.
+- `vignette("inequality-matrices")`: ordinal patterns, semiorders and weak
+  orderings.
+- `vignette("universal-set")`: counting every possible pattern, and when the
+  measurement scale matters.
+- `vignette("gdistance")`: accommodation, excess flexibility and g-distance.
+
+To install the package with its vignettes, use
+`remotes::install_github('lenarddome/clobe', build_vignettes = TRUE)`.
 
 ## Paper
 
