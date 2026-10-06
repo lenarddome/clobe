@@ -3,6 +3,8 @@
 #include <RcppArmadillo.h>
 
 #include <cmath>
+#include <set>
+#include <vector>
 
 namespace {
 
@@ -34,16 +36,29 @@ arma::colvec Accommodation(const arma::cube& discovered,
   return accommodated;
 }
 
-// Prediction statistics: counts the patterns in predicted that are not in
-// discovered.
-double Prediction(const arma::cube& discovered, const arma::cube& predicted) {
-  double prediction = 0;
-  for (arma::uword x = 0; x < predicted.n_slices; x++) {
-    bool found = false;
-    for (arma::uword y = 0; y < discovered.n_slices && !found; y++) {
-      found = SamePattern(discovered.slice(y), predicted.slice(x));
+// Returns the unique patterns in a cube, each as its strict upper triangle.
+std::set<std::vector<double>> UniquePatterns(const arma::cube& patterns) {
+  std::set<std::vector<double>> unique;
+  std::vector<double> cells;
+  for (arma::uword s = 0; s < patterns.n_slices; s++) {
+    cells.clear();
+    for (arma::uword col = 1; col < patterns.n_cols; col++) {
+      for (arma::uword row = 0; row < col; row++) {
+        cells.push_back(patterns(row, col, s));
+      }
     }
-    if (!found) prediction += 1;
+    unique.insert(cells);
+  }
+  return unique;
+}
+
+// Prediction statistics: counts the unique patterns in predicted that are not
+// in discovered.
+double Prediction(const std::set<std::vector<double>>& discovered,
+                  const std::set<std::vector<double>>& predicted) {
+  double prediction = 0;
+  for (const std::vector<double>& pattern : predicted) {
+    if (discovered.count(pattern) == 0) prediction += 1;
   }
   return prediction;
 }
@@ -63,9 +78,11 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
   if (frequencies.n_elem != human.n_slices) {
     Rcpp::stop("'frequencies' must have one element per pattern in 'human'.");
   }
-  if (universal < human.n_slices) {
+  const std::set<std::vector<double>> human_patterns = UniquePatterns(human);
+  const double observed = human_patterns.size();
+  if (universal < observed) {
     Rcpp::stop(
-        "'universal' cannot be smaller than the number of patterns in "
+        "'universal' cannot be smaller than the number of unique patterns in "
         "'human'.");
   }
   if (weight < 0 || weight > 1) {
@@ -78,7 +95,7 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
   double beta;
   double distance;
   // if human = universal, there are no predictions to be made
-  if (universal == human.n_slices) {
+  if (universal == observed) {
     // only calculate accommodation and return warning
     beta = arma::datum::nan;
     distance = std::sqrt(weight * std::pow(1 - alpha_weighted, 2));
@@ -86,7 +103,8 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
         "'beta' cannot be calculated because human = universal, so it was "
         "excluded from distance.");
   } else {
-    beta = Prediction(human, model) / (universal - human.n_slices);
+    beta = Prediction(human_patterns, UniquePatterns(model)) /
+           (universal - observed);
     distance = std::sqrt(weight * std::pow(1 - alpha_weighted, 2) +
                          (1 - weight) * std::pow(beta, 2));
   }

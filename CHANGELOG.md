@@ -38,6 +38,11 @@ Breaking changes are marked **Breaking**.
   `return_permutations = TRUE`, as it has `length(dependent)^length` rows.
 - **Breaking:** `brutes()` returns the unique inequality matrices sorted by
   pattern rather than in order of discovery.
+- **Breaking:** `gdistance()` computes beta over unique patterns, as defined
+  in Dome and Wills (2025): duplicated slices in `model` count as one novel
+  prediction, and the denominator is `universal` minus the number of unique
+  patterns in `human`. Beta was inflated when either array contained a pattern
+  more than once.
 - **Breaking:** only `brutes()`, `gdistance()` and `imac()` are exported,
   instead of every object in the package namespace.
 - `brutes()` is much faster: each matrix is encoded as a compact key and
@@ -47,7 +52,7 @@ Breaking changes are marked **Breaking**.
 - `imac()` and `brutes()` check that `thresholds` is `c(upper, lower)`, and
   `brutes()` checks `dependent` and `length`.
 - `gdistance()` checks the matrix dimensions, the length of `frequencies`,
-  that `universal` is not smaller than the number of human patterns, and that
+  that `universal` is not smaller than the number of unique human patterns, and that
   `weight` is between 0 and 1.
 - Cite the published version of Dome and Wills (2025), *Psychological
   Review*, <https://doi.org/10.1037/rev0000550>, instead of the 2023 preprint.

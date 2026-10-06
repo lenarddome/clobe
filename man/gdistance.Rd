@@ -30,7 +30,9 @@
    \deqn{ g = \sqrt{ w(1 - \alpha)^2 + (1-w)\beta^2 } .}
 
    Two inequality matrices are the same pattern if their strict upper
-   triangles are identical (see \code{\link{imac}}).
+   triangles are identical (see \code{\link{imac}}). Beta counts each
+   unique pattern once, however often it occurs in \code{human} or
+   \code{model}.
 
    For a more thorough overview of the method, see Dome and Wills (2025).
 
@@ -43,8 +45,10 @@
 
    \item{alpha}{Double. Accommodation score showing the proportion of accommodated
                 patterns relative to all observed human patterns.}
-   \item{beta}{Double. The breadth of model predictions returned as the proportion of
-               model predictions and universal. See Note 1.}
+   \item{beta}{Double. Excess flexibility: the number of unique model patterns
+               not observed in humans, divided by the number of possible
+               patterns not observed in humans (\code{universal} minus the
+               number of unique human patterns). See Note 1.}
    \item{accommodation}{Integer vector of the (1-based) indices of accommodated
                         patterns in \code{human}.}
  
@@ -79,5 +83,5 @@ gdistance(human, model, universal = universal, weight = 0.5,
 }
 
 \note{
-  1. If the number of human patterns is equal to the number of possible patterns in the universal set, \code{gdistance} throws a warning and returns \code{beta} == NA. 
+  1. If the number of unique human patterns is equal to the number of possible patterns in the universal set, \code{gdistance} throws a warning and returns \code{beta} == NaN. 
 }
