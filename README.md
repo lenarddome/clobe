@@ -20,17 +20,36 @@ thresholds <- c(0.1, -0.1)
 # discretise a result into an inequality matrix of ordinal relationships
 imac(c(0.9, 0.5, 0.45), thresholds)
 
-# size of the universal set: every pattern observable for 4 stimuli
-# measured on a 0.1 grid (runs in parallel)
-brutes(seq(0, 1, by = 0.1), length = 4, thresholds = thresholds)$n
+# unique patterns in results, one row per participant or model run
+human <- patterns(rbind(c(0.9, 0.5, 0.1),
+                        c(0.8, 0.5, 0.2),
+                        c(0.1, 0.5, 0.9)), thresholds)
+model <- patterns(rbind(c(0.9, 0.5, 0.1),
+                        c(0.5, 0.5, 0.5)), thresholds)
+
+# size of the universal set for 3 stimuli
+universal <- semiorders(3)
 
 # compare model and human heterogeneity
-# gdistance(human, model, universal, weight = 0.5, frequencies, xtdo = TRUE)
+gdistance(human$inequality_matrices, model$inequality_matrices,
+          universal = universal, weight = 0.5,
+          frequencies = human$frequencies, xtdo = TRUE)
 ```
 
 By default, differences within the thresholds count as approximately equal,
 so patterns are semiorders. Use `ordering = "weak"` to treat only ties as
-equal (weak orderings). See `?imac`, `?brutes` and `?gdistance`.
+equal (weak orderings).
+
+To work with the universal set:
+
+- `semiorders()`, `fubini()` and `stirling2()` count patterns.
+- `orderings()` lists every pattern.
+- `brutes()` finds the patterns that a given set of measurable values can
+  produce, in parallel. This matters when the measurement scale is too coarse
+  to realise every semiorder.
+- `pattern_distance()` measures how far apart two patterns are.
+
+See the help page of each function for details.
 
 ## Paper
 
