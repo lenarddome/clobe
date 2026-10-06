@@ -17,3 +17,7 @@ imac <- function(probabilities, thresholds, ordering = "semiorder") {
     .Call(`_clobe_Orderings`, length, ordering)
 }
 
+.pattern_distance <- function(x, y, method) {
+    .Call(`_clobe_PatternDistance`, x, y, method)
+}
+

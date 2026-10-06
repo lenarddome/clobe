@@ -1,4 +1,5 @@
 useDynLib(clobe, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 importFrom(RcppParallel, RcppParallelLibs)
-export(brutes, fubini, gdistance, imac, orderings, semiorders, stirling2)
+export(brutes, fubini, gdistance, imac, orderings, pattern_distance, semiorders,
+       stirling2)

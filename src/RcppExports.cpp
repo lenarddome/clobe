@@ -69,12 +69,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// PatternDistance
+arma::mat PatternDistance(const arma::cube& x, const arma::cube& y, const std::string& method);
+RcppExport SEXP _clobe_PatternDistance(SEXP xSEXP, SEXP ySEXP, SEXP methodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::cube& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::cube& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(PatternDistance(x, y, method));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_clobe_Brutes", (DL_FUNC) &_clobe_Brutes, 7},
     {"_clobe_GDistance", (DL_FUNC) &_clobe_GDistance, 6},
     {"_clobe_Imac", (DL_FUNC) &_clobe_Imac, 3},
     {"_clobe_Orderings", (DL_FUNC) &_clobe_Orderings, 2},
+    {"_clobe_PatternDistance", (DL_FUNC) &_clobe_PatternDistance, 3},
     {NULL, NULL, 0}
 };
 
