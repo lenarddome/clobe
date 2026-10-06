@@ -1,23 +1,31 @@
 // Copyright 2022 <Lenard Dome> [legal/copyright]
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+#include "imac.h"
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 using namespace arma;
 
+void imac_check_thresholds(const arma::vec& thresholds) {
+  if (thresholds.n_elem != 2) {
+    stop("'thresholds' must have exactly 2 elements: c(upper, lower).");
+  }
+  if (thresholds[0] < thresholds[1]) {
+    stop("'thresholds' must be c(upper, lower) with upper >= lower.");
+  }
+}
+
 // [[Rcpp::export]]
 arma::mat imac(arma::vec probabilities, arma::vec thresholds) {
-  // setup environment
+  imac_check_thresholds(thresholds);
+  // cells on and below the diagonal are not compared and take the value 2
   mat inequality(probabilities.n_elem, probabilities.n_elem, fill::value(2));
   for (uword i = 0; i < probabilities.n_elem; i++) {
     for (uword k = i + 1; k < probabilities.n_elem; k++) {
-      inequality(i, k) =  probabilities[i] - probabilities[k];
+      inequality(i, k) = imac_classify(probabilities[i] - probabilities[k],
+                                       thresholds[0], thresholds[1]);
     }
   }
-  // apply the rules to the differences
-  inequality.elem( find(inequality >= thresholds[0] && inequality < 2)).fill(1);
-  inequality.elem( find(inequality <= thresholds[1])).fill(-1);
-  inequality.elem( find(inequality > thresholds[1] && inequality < thresholds[0])).fill(0);
   return(inequality);
 }
