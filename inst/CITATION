@@ -1,0 +1,12 @@
+bibentry(
+  bibtype = "Misc",
+  title = "g-distance: On the comparison of model and human heterogeneity",
+  author = c(person("Lenard", "Dome"), person("Andy", "Wills")),
+  year = "2023",
+  howpublished = "PsyArXiv",
+  doi = "10.31234/osf.io/ygmcj",
+  textVersion = paste(
+    "Dome, L., & Wills, A. (2023). g-distance: On the comparison of model",
+    "and human heterogeneity. PsyArXiv. https://doi.org/10.31234/osf.io/ygmcj"
+  )
+)

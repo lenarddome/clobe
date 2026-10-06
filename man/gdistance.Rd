@@ -27,7 +27,10 @@
   models as described by Dome and Wills (2023). The general form of g-distance
   is as:
 
-   \deqn{ g = \sqrt{ w(1 - \alpha)^2 + (1-w)\beta} .}
+   \deqn{ g = \sqrt{ w(1 - \alpha)^2 + (1-w)\beta^2 } .}
+
+   Two inequality matrices are the same pattern if their strict upper
+   triangles are identical (see \code{\link{imac}}).
 
    For a more thorough overview of the method, see Dome and Wills (2023).
 
@@ -55,6 +58,24 @@
 
   Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. https://doi.org/10.31234/osf.io/ygmcj
 
+}
+
+\seealso{
+  \code{\link{imac}}, \code{\link{brutes}}
+}
+
+\examples{
+thresholds <- c(0.1, -0.1)
+## two human patterns, observed with frequencies 0.75 and 0.25
+human <- simplify2array(list(imac(c(0.9, 0.5, 0.1), thresholds),
+                             imac(c(0.1, 0.5, 0.9), thresholds)))
+## the model produces the first human pattern and one novel pattern
+model <- simplify2array(list(imac(c(0.9, 0.5, 0.1), thresholds),
+                             imac(c(0.5, 0.5, 0.1), thresholds)))
+## size of the universal set for 3 stimuli
+universal <- brutes(seq(0, 1, by = 0.1), 3, thresholds)$n
+gdistance(human, model, universal = universal, weight = 0.5,
+          frequencies = c(0.75, 0.25), xtdo = TRUE)
 }
 
 \note{

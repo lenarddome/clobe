@@ -67,6 +67,13 @@ While the major version is 0, breaking changes bump the minor version.
 
 - Dependency on RcppAlgos, and the unused suggested packages plyr and abind.
 
+## Documentation
+
+- Fix the `gdistance()` formula (beta is squared), the `imac()` formula and
+  value description, and typos.
+- Add examples to `brutes()` and `gdistance()`, a usage section to the README,
+  and `inst/CITATION` so that `citation("clobe")` works as documented.
+
 ## Changed (infrastructure)
 
 - `DESCRIPTION`: point `URL` and `BugReports` to the clobe repository (they
