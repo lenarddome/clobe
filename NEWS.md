@@ -1,15 +1,23 @@
-# Changelog
-
+<!--
 All notable changes to this project are documented in this file.
+The format is based on Keep a Changelog (https://keepachangelog.com/en/1.1.0/),
+and this project adheres to Semantic Versioning
+(https://semver.org/spec/v2.0.0.html). While the major version is 0, breaking
+changes bump the minor version.
+-->
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-While the major version is 0, breaking changes bump the minor version.
+# clobe 0.7.0
 
-# clobe (development version)
+Released 2026-10-06.
 
 ## Breaking changes
 
+- `imac()` treats a difference exactly equal to a threshold as approximately
+  equal (it was classified as larger or smaller, apart from rounding errors).
+  Together with the tolerance fix below, this keeps the previous results of
+  `brutes()` for 11 equally spaced values and thresholds of one step (19 and
+  183 patterns for 3 and 4 stimuli), which are now computed consistently
+  rather than by accident of rounding.
 - `gdistance(xtdo = TRUE)` returns the accommodated patterns as
   `accommodation` (was misspelled `accomodation`), as 1-based indices into
   `human` (were 0-based), in a plain integer vector (was a one-column matrix).
@@ -17,12 +25,6 @@ While the major version is 0, breaking changes bump the minor version.
   has `length(dependent)^length` rows; use `return_permutations = TRUE`.
 - `brutes()` returns the unique inequality matrices sorted by pattern rather
   than in order of discovery.
-- `imac()` treats a difference exactly equal to a threshold as approximately
-  equal (it was classified as larger or smaller, apart from rounding errors).
-  Together with the tolerance fix below, this keeps the previous results of
-  `brutes()` for 11 equally spaced values and thresholds of one step (19 and
-  183 patterns for 3 and 4 stimuli), which are now computed consistently
-  rather than by accident of rounding.
 
 ## Added
 
@@ -34,6 +36,23 @@ While the major version is 0, breaking changes bump the minor version.
   default; set the number of threads with the new `threads` argument or
   `RcppParallel::setThreadOptions()`. It can now be interrupted.
 - `return_permutations` argument to `brutes()`.
+
+## Changed
+
+- `brutes()` is much faster: each matrix is encoded as a compact key and
+  deduplicated, instead of being compared against every matrix found so far,
+  and permutations are generated on the fly instead of being stored. For 11
+  values and 5 stimuli it takes milliseconds instead of ~23 seconds.
+- `imac()` errors if `thresholds` is not `c(upper, lower)`.
+- `brutes()` validates `dependent`, `length` and `thresholds`.
+- `gdistance()` validates its input: matrix dimensions, the length of
+  `frequencies`, `universal >= dim(human)[3]` and `0 <= weight <= 1`.
+- Only `brutes()`, `gdistance()` and `imac()` are exported, instead of every
+  object in the package namespace.
+
+## Removed
+
+- Dependency on RcppAlgos, and the unused suggested packages plyr and abind.
 
 ## Fixed
 
@@ -49,34 +68,17 @@ While the major version is 0, breaking changes bump the minor version.
   pattern and as a novel prediction. Both now compare the strict upper
   triangle.
 
-## Changed
-
-- `brutes()` is much faster: matrices are deduplicated with a hash set instead
-  of being compared against every matrix found so far, and permutations are
-  generated on the fly instead of being stored. For 11 values and 5 stimuli
-  it takes milliseconds instead of ~23 seconds.
-- `imac()` now errors if `thresholds` is not `c(upper, lower)`.
-- `gdistance()` now validates its input: matrix dimensions, the length of
-  `frequencies`, `universal >= dim(human)[3]` and `0 <= weight <= 1`.
-- `brutes()` validates `dependent`, `length` and `thresholds`.
-- `gdistance()` documentation no longer claims `weight` defaults to 0.5.
-- Only `brutes()`, `gdistance()` and `imac()` are exported, instead of every
-  object in the package namespace.
-
-## Removed
-
-- Dependency on RcppAlgos, and the unused suggested packages plyr and abind.
-
 ## Documentation
 
-- Fix the `gdistance()` formula (beta is squared), the `imac()` formula and
-  value description, and typos.
 - Cite the published version of Dome and Wills (2025), Psychological Review,
   <doi:10.1037/rev0000550>, instead of the 2023 preprint.
+- Fix the `gdistance()` formula (beta is squared), the `imac()` formula and
+  value description, and typos; `gdistance()` documentation no longer claims
+  `weight` defaults to 0.5.
 - Add examples to `brutes()` and `gdistance()`, a usage section to the README,
   and `inst/CITATION` so that `citation("clobe")` works as documented.
 
-## Changed (infrastructure)
+## Infrastructure
 
 - `DESCRIPTION`: point `URL` and `BugReports` to the clobe repository (they
   pointed to globe) and drop the redundant `Author`/`Maintainer` fields.
@@ -84,3 +86,7 @@ While the major version is 0, breaking changes bump the minor version.
   `clang-format` (`.clang-format`: `BasedOnStyle: Google`).
 - CI: update `actions/checkout` to v4.
 - Ignore macOS `.DS_Store` files.
+
+# clobe 0.6.0
+
+- Last version before this changelog was kept.
