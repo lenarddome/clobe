@@ -11,24 +11,24 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// brutes
-List brutes(NumericVector dependent, int length, arma::vec thresholds, std::string ordering, bool return_permutations);
-RcppExport SEXP _clobe_brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP, SEXP return_permutationsSEXP) {
+// Brutes
+Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length, const arma::vec& thresholds, const std::string& ordering, bool return_permutations);
+RcppExport SEXP _clobe_Brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP, SEXP return_permutationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type dependent(dependentSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type dependent(dependentSEXP);
     Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ordering(orderingSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type thresholds(thresholdsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type ordering(orderingSEXP);
     Rcpp::traits::input_parameter< bool >::type return_permutations(return_permutationsSEXP);
-    rcpp_result_gen = Rcpp::wrap(brutes(dependent, length, thresholds, ordering, return_permutations));
+    rcpp_result_gen = Rcpp::wrap(Brutes(dependent, length, thresholds, ordering, return_permutations));
     return rcpp_result_gen;
 END_RCPP
 }
-// gdistance
-List gdistance(const arma::cube& human, const arma::cube& model, double universal, double weight, arma::colvec frequencies, bool xtdo);
-RcppExport SEXP _clobe_gdistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP xtdoSEXP) {
+// GDistance
+Rcpp::List GDistance(const arma::cube& human, const arma::cube& model, double universal, double weight, const arma::colvec& frequencies, bool xtdo);
+RcppExport SEXP _clobe_GDistance(SEXP humanSEXP, SEXP modelSEXP, SEXP universalSEXP, SEXP weightSEXP, SEXP frequenciesSEXP, SEXP xtdoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -36,30 +36,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::cube& >::type model(modelSEXP);
     Rcpp::traits::input_parameter< double >::type universal(universalSEXP);
     Rcpp::traits::input_parameter< double >::type weight(weightSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type frequencies(frequenciesSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type frequencies(frequenciesSEXP);
     Rcpp::traits::input_parameter< bool >::type xtdo(xtdoSEXP);
-    rcpp_result_gen = Rcpp::wrap(gdistance(human, model, universal, weight, frequencies, xtdo));
+    rcpp_result_gen = Rcpp::wrap(GDistance(human, model, universal, weight, frequencies, xtdo));
     return rcpp_result_gen;
 END_RCPP
 }
-// imac
-arma::mat imac(arma::vec probabilities, arma::vec thresholds, std::string ordering);
-RcppExport SEXP _clobe_imac(SEXP probabilitiesSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP) {
+// Imac
+arma::mat Imac(const arma::vec& probabilities, const arma::vec& thresholds, const std::string& ordering);
+RcppExport SEXP _clobe_Imac(SEXP probabilitiesSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type probabilities(probabilitiesSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type thresholds(thresholdsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ordering(orderingSEXP);
-    rcpp_result_gen = Rcpp::wrap(imac(probabilities, thresholds, ordering));
+    Rcpp::traits::input_parameter< const arma::vec& >::type probabilities(probabilitiesSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type thresholds(thresholdsSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type ordering(orderingSEXP);
+    rcpp_result_gen = Rcpp::wrap(Imac(probabilities, thresholds, ordering));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clobe_brutes", (DL_FUNC) &_clobe_brutes, 5},
-    {"_clobe_gdistance", (DL_FUNC) &_clobe_gdistance, 6},
-    {"_clobe_imac", (DL_FUNC) &_clobe_imac, 3},
+    {"_clobe_Brutes", (DL_FUNC) &_clobe_Brutes, 5},
+    {"_clobe_GDistance", (DL_FUNC) &_clobe_GDistance, 6},
+    {"_clobe_Imac", (DL_FUNC) &_clobe_Imac, 3},
     {NULL, NULL, 0}
 };
 

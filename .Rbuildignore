@@ -11,3 +11,4 @@
 ^pkgdown$
 ^.vscode/
 ^LICENSE\.md$
+^\.clang-format$

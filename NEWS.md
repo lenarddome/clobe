@@ -64,5 +64,7 @@ While the major version is 0, breaking changes bump the minor version.
 
 ## Changed (infrastructure)
 
+- C++ sources follow the Google C++ Style Guide and are formatted with
+  `clang-format` (`.clang-format`: `BasedOnStyle: Google`).
 - CI: update `actions/checkout` to v4.
 - Ignore macOS `.DS_Store` files.

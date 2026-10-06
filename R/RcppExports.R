@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 brutes <- function(dependent, length, thresholds, ordering = "semiorder", return_permutations = FALSE) {
-    .Call(`_clobe_brutes`, dependent, length, thresholds, ordering, return_permutations)
+    .Call(`_clobe_Brutes`, dependent, length, thresholds, ordering, return_permutations)
 }
 
 gdistance <- function(human, model, universal, weight, frequencies, xtdo = FALSE) {
-    .Call(`_clobe_gdistance`, human, model, universal, weight, frequencies, xtdo)
+    .Call(`_clobe_GDistance`, human, model, universal, weight, frequencies, xtdo)
 }
 
 imac <- function(probabilities, thresholds, ordering = "semiorder") {
-    .Call(`_clobe_imac`, probabilities, thresholds, ordering)
+    .Call(`_clobe_Imac`, probabilities, thresholds, ordering)
 }
 
