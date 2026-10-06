@@ -11,6 +11,7 @@
 #include <iterator>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "imac.h"
@@ -160,9 +161,10 @@ std::size_t CountPermutations(std::size_t m, std::size_t k) {
   return total;
 }
 
+// Returns the sorted, unique keys of the patterns of all permutations.
 template <typename Key>
-arma::cube UniqueMatrices(const std::vector<int>& classes, std::size_t m,
-                          std::size_t k, std::size_t total, int threads) {
+std::vector<Key> UniqueKeys(const std::vector<int>& classes, std::size_t m,
+                            std::size_t k, std::size_t total, int threads) {
   const std::size_t slices = ResolveThreads(threads);
   std::vector<Collector<Key>> collectors(slices, Collector<Key>(classes, m, k));
   for (std::size_t begin = 0; begin < total; begin += kChunkSize) {
@@ -182,7 +184,19 @@ arma::cube UniqueMatrices(const std::vector<int>& classes, std::size_t m,
     MergeWorker<Key> merge_worker(&sorted, step);
     RcppParallel::parallelFor(0, pairs, merge_worker, 1, slices);
   }
-  return KeysToCube(sorted[0], k);
+  return std::move(sorted[0]);
+}
+
+// Returns the number of unique patterns, and their inequality matrices if
+// return_matrices is true.
+template <typename Key>
+std::pair<double, Rcpp::RObject> UniqueMatrices(const std::vector<int>& classes,
+                                                std::size_t m, std::size_t k,
+                                                std::size_t total, int threads,
+                                                bool return_matrices) {
+  const std::vector<Key> keys = UniqueKeys<Key>(classes, m, k, total, threads);
+  if (!return_matrices) return {static_cast<double>(keys.size()), R_NilValue};
+  return {static_cast<double>(keys.size()), Rcpp::wrap(KeysToCube(keys, k))};
 }
 
 }  // namespace
@@ -191,7 +205,8 @@ arma::cube UniqueMatrices(const std::vector<int>& classes, std::size_t m,
 Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length,
                   const arma::vec& thresholds,
                   const std::string& ordering = "semiorder",
-                  bool return_permutations = false, int threads = -1) {
+                  bool return_matrices = true, bool return_permutations = false,
+                  int threads = -1) {
   if (dependent.size() == 0) Rcpp::stop("'dependent' must not be empty.");
   if (length < 1) Rcpp::stop("'length' must be at least 1.");
   CheckThresholds(thresholds);
@@ -218,12 +233,12 @@ Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length,
     }
   }
 
-  arma::cube ordinals;
-  if (CountCells(k) <= kMaxPackedCells) {
-    ordinals = UniqueMatrices<uint64_t>(classes, m, k, total, threads);
-  } else {
-    ordinals = UniqueMatrices<std::string>(classes, m, k, total, threads);
-  }
+  const std::pair<double, Rcpp::RObject> patterns =
+      CountCells(k) <= kMaxPackedCells
+          ? UniqueMatrices<uint64_t>(classes, m, k, total, threads,
+                                     return_matrices)
+          : UniqueMatrices<std::string>(classes, m, k, total, threads,
+                                        return_matrices);
 
   Rcpp::RObject permutations = R_NilValue;
   if (return_permutations) {
@@ -245,6 +260,6 @@ Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length,
 
   return Rcpp::List::create(
       Rcpp::Named("permutations") = permutations,
-      Rcpp::Named("inequality_matrices") = ordinals,
-      Rcpp::Named("n") = static_cast<double>(ordinals.n_slices));
+      Rcpp::Named("inequality_matrices") = patterns.second,
+      Rcpp::Named("n") = patterns.first);
 }

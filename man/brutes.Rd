@@ -3,7 +3,7 @@
 \title{brutes}
 \usage{
     brutes(dependent, length, thresholds, ordering = "semiorder",
-           return_permutations = FALSE, threads = -1L)
+           return_matrices = TRUE, return_permutations = FALSE, threads = -1L)
     }
 
 \description{
@@ -19,6 +19,10 @@
         treated as approximately equal. See \code{\link{imac}}.}
     \item{ordering}{Either \code{"semiorder"} (default) or \code{"weak"}. See
         \code{\link{imac}}.}
+    \item{return_matrices}{Logical. Whether to return the unique inequality
+        matrices. Default is \code{TRUE}. With \code{FALSE}, only their
+        number is returned, which is faster and needs much less memory for
+        many stimuli.}
     \item{return_permutations}{Logical. Whether to return every assignment of
         \code{dependent} values to the stimuli. Default is \code{FALSE}, as
         there are \code{length(dependent)^length} of them.}
@@ -56,8 +60,9 @@ Returns the following list of elements:
     matrix with \code{length} columns and one row per assignment of
     \code{dependent} values to the stimuli, with the last column changing
     fastest.}
-\item{inequality_matrices}{3D array. The unique inequality matrices found,
-    sorted by pattern.}
+\item{inequality_matrices}{\code{NULL} if \code{return_matrices = FALSE},
+    otherwise a 3D array of the unique inequality matrices found, sorted by
+    pattern.}
 \item{n}{Integer. The number of unique inequality matrices found.}
 
 }

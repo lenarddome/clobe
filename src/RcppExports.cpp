@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // Brutes
-Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length, const arma::vec& thresholds, const std::string& ordering, bool return_permutations, int threads);
-RcppExport SEXP _clobe_Brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP, SEXP return_permutationsSEXP, SEXP threadsSEXP) {
+Rcpp::List Brutes(const Rcpp::NumericVector& dependent, int length, const arma::vec& thresholds, const std::string& ordering, bool return_matrices, bool return_permutations, int threads);
+RcppExport SEXP _clobe_Brutes(SEXP dependentSEXP, SEXP lengthSEXP, SEXP thresholdsSEXP, SEXP orderingSEXP, SEXP return_matricesSEXP, SEXP return_permutationsSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,9 +21,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type thresholds(thresholdsSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type ordering(orderingSEXP);
+    Rcpp::traits::input_parameter< bool >::type return_matrices(return_matricesSEXP);
     Rcpp::traits::input_parameter< bool >::type return_permutations(return_permutationsSEXP);
     Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Brutes(dependent, length, thresholds, ordering, return_permutations, threads));
+    rcpp_result_gen = Rcpp::wrap(Brutes(dependent, length, thresholds, ordering, return_matrices, return_permutations, threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -58,7 +59,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clobe_Brutes", (DL_FUNC) &_clobe_Brutes, 6},
+    {"_clobe_Brutes", (DL_FUNC) &_clobe_Brutes, 7},
     {"_clobe_GDistance", (DL_FUNC) &_clobe_GDistance, 6},
     {"_clobe_Imac", (DL_FUNC) &_clobe_Imac, 3},
     {NULL, NULL, 0}

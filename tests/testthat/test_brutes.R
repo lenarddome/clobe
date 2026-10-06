@@ -98,3 +98,10 @@ test_that("brutes gives the same result on one or several threads", {
     expect_error(brutes(seq(0, 1, by = 0.1), 2, c(0.1, -0.1), threads = 0),
                  "threads")
 })
+
+test_that("brutes can return only the number of patterns", {
+    out <- brutes(seq(0, 1, by = 0.1), 4, c(0.1, -0.1),
+                  return_matrices = FALSE)
+    expect_null(out$inequality_matrices)
+    expect_equal(out$n, 183)
+})

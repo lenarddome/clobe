@@ -19,6 +19,9 @@ Breaking changes are marked **Breaking**.
   default. Set the number of threads with the new `threads` argument or with
   `RcppParallel::setThreadOptions()`. It can now be interrupted.
 - `return_permutations` argument to `brutes()`.
+- `return_matrices` argument to `brutes()`: with `FALSE`, only the number of
+  patterns is returned. For 8 stimuli, this halves the running time and avoids
+  returning an array of about 3.7 GB.
 - `inst/CITATION`, so that `citation("clobe")` works as documented.
 - Examples for `brutes()` and `gdistance()`, and a usage section in the README.
 - `.clang-format` file; the C++ sources follow the Google C++ Style Guide.
