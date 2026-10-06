@@ -19,5 +19,8 @@ LinkingTo: Rcpp, RcppArmadillo, RcppParallel
 SystemRequirements: GNU make
 Encoding: UTF-8
 Suggests:
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
+VignetteBuilder: knitr
 Config/testthat/edition: 3

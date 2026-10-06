@@ -1,0 +1,165 @@
+---
+title: "Getting started with clobe"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with clobe}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+clobe compares the *range of behaviour* a computational model can produce
+with the range of behaviour people actually show. Instead of asking "how close
+is the model to the average participant?", it asks two questions:
+
+1. Can the model produce what each participant did? (**accommodation**)
+2. Does the model also produce many things nobody did? (**excess
+   flexibility**)
+
+g-distance (Dome & Wills, 2025) combines the two into a single number. This
+vignette walks through the whole workflow on simulated data. The other
+vignettes explain each step and its mathematics in more detail:
+
+- `vignette("inequality-matrices")`: how a result becomes an ordinal pattern.
+- `vignette("universal-set")`: counting every pattern that could occur.
+- `vignette("gdistance")`: accommodation, excess flexibility and g-distance.
+
+```{r}
+library(clobe)
+```
+
+## The experiment
+
+Imagine an experiment with four conditions (we will call them *stimuli*).
+Each of 40 participants does 20 trials per stimulus, and we record the
+proportion of trials on which they gave a particular response. Participants
+differ: some respond more often as we go from stimulus 1 to stimulus 4, some
+less often, and some barely change.
+
+```{r}
+set.seed(2025)
+x <- c(-1.5, -0.5, 0.5, 1.5)  # a feature of each stimulus
+slopes <- rnorm(40, mean = 0.5, sd = 1)
+human <- t(sapply(slopes, function(b) {
+  p <- plogis(b * x + rnorm(4, sd = 0.3))
+  rbinom(4, size = 20, prob = p) / 20
+}))
+head(human)
+```
+
+## Step 1: turn each result into a pattern
+
+Averaging these rows would hide the differences between participants.
+Instead, we describe each participant by the *ordinal pattern* of their
+results: for every pair of stimuli, is the first larger, smaller, or about
+the same as the second? "About the same" means the difference is no larger
+than a threshold, here 0.1 (two trials out of twenty).
+
+```{r}
+thresholds <- c(0.1, -0.1)
+imac(human[1, ], thresholds)
+```
+
+Read the matrix row against column: the entry in row 1 and column 3 says how
+stimulus 1 compares with stimulus 3 (1 larger, -1 smaller, 0 about the same).
+Only the cells above the diagonal carry information; the others are set to 2.
+
+`patterns()` does this for every participant and keeps each distinct pattern
+once, with how often it occurred:
+
+```{r}
+people <- patterns(human, thresholds)
+people$n
+people$counts
+```
+
+The `r people$n` distinct patterns among 40 participants are the behaviour the
+model should be able to produce.
+
+## Step 2: what could anyone have done?
+
+To judge whether a model is too flexible, we need to know how many patterns
+were possible at all: the **universal set**. With four stimuli and
+"about the same" meaning "within the threshold", the patterns are what
+mathematicians call *semiorders*, and there are exactly
+
+```{r}
+semiorders(4)
+```
+
+of them. Because our measurements are proportions of 20 trials, we can also
+check that this measurement scale can produce every one of them:
+
+```{r}
+brutes(seq(0, 1, by = 0.05), length = 4, thresholds = thresholds,
+       return_matrices = FALSE)$n
+```
+
+It can, so the universal set has `r semiorders(4)` patterns.
+
+## Step 3: what can the model do?
+
+A model is a set of patterns too: the patterns it produces across its
+parameter space. Here are two toy models of the response probabilities. The
+first can only produce monotonic changes across the stimuli; the second adds a
+quadratic term, so it can also produce U-shapes and inverted U-shapes.
+
+```{r}
+grid <- seq(-3, 3, by = 0.1)
+
+linear <- t(sapply(grid, function(b) plogis(b * x)))
+
+quadratic <- as.matrix(expand.grid(b = grid, c = grid))
+quadratic <- t(apply(quadratic, 1, function(theta) {
+  plogis(theta[["b"]] * x + theta[["c"]] * x^2)
+}))
+
+linear <- patterns(linear, thresholds)
+quadratic <- patterns(quadratic, thresholds)
+c(linear = linear$n, quadratic = quadratic$n)
+```
+
+## Step 4: compare
+
+`gdistance()` takes the human patterns, the model patterns, the size of the
+universal set, a weight, and how often each human pattern occurred.
+
+```{r}
+compare <- function(model) {
+  out <- gdistance(people$inequality_matrices, model$inequality_matrices,
+                   universal = semiorders(4), weight = 0.5,
+                   frequencies = people$frequencies, xtdo = TRUE)
+  round(c(alpha = out$alpha, beta = out$beta, g = out$gdistance), 3)
+}
+rbind(linear = compare(linear), quadratic = compare(quadratic))
+```
+
+- **alpha** is the proportion of participants whose pattern the model can
+  produce. Higher is better.
+- **beta** is the proportion of the patterns *nobody showed* that the model
+  produces anyway. Lower is better.
+- **g** is the distance from the ideal model, which produces every observed
+  pattern and nothing else. Lower is better; it runs from 0 to 1.
+
+```{r, include = FALSE}
+results <- rbind(linear = compare(linear), quadratic = compare(quadratic))
+```
+
+The quadratic model accommodates more participants
+(`r results["quadratic", "alpha"]` against `r results["linear", "alpha"]`),
+but it pays for it with extra patterns that nobody produced
+(beta of `r results["quadratic", "beta"]` against
+`r results["linear", "beta"]`). g-distance weighs the two; with
+`weight = 0.5` they count equally, and here the
+`r rownames(results)[which.min(results[, "g"])]` model ends up closer to the
+ideal. `vignette("gdistance")` explains the
+formula and how to choose the weight.
+
+## Reference
+
+Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and
+human heterogeneity. *Psychological Review, 132*(3), 632-655.
+https://doi.org/10.1037/rev0000550
