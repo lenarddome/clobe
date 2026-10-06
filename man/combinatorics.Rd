@@ -79,7 +79,7 @@ All counts are doubles, which represent whole numbers exactly up to
 }
 
 \seealso{
-  \code{\link{brutes}}
+  \code{\link{brutes}}, \code{\link{orderings}}
 }
 
 \examples{

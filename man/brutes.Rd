@@ -78,7 +78,8 @@ Returns the following list of elements:
 }
 
 \seealso{
-  \code{\link{imac}}, \code{\link{gdistance}}
+  \code{\link{imac}}, \code{\link{gdistance}}, \code{\link{orderings}},
+  \code{\link{semiorders}}, \code{\link{fubini}}
 }
 
 \examples{

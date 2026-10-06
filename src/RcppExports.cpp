@@ -57,11 +57,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Orderings
+Rcpp::List Orderings(int length, const std::string& ordering);
+RcppExport SEXP _clobe_Orderings(SEXP lengthSEXP, SEXP orderingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type length(lengthSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type ordering(orderingSEXP);
+    rcpp_result_gen = Rcpp::wrap(Orderings(length, ordering));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_clobe_Brutes", (DL_FUNC) &_clobe_Brutes, 7},
     {"_clobe_GDistance", (DL_FUNC) &_clobe_GDistance, 6},
     {"_clobe_Imac", (DL_FUNC) &_clobe_Imac, 3},
+    {"_clobe_Orderings", (DL_FUNC) &_clobe_Orderings, 2},
     {NULL, NULL, 0}
 };
 

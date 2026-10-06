@@ -13,3 +13,7 @@ imac <- function(probabilities, thresholds, ordering = "semiorder") {
     .Call(`_clobe_Imac`, probabilities, thresholds, ordering)
 }
 
+.orderings <- function(length, ordering) {
+    .Call(`_clobe_Orderings`, length, ordering)
+}
+
