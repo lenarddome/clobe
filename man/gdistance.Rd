@@ -9,10 +9,11 @@
   gdistance(human, model, universal, weight, frequencies, xtdo = FALSE)
 }
 \arguments{
-  \item{human}{A 3D array of observed inequality matrices.}
-  \item{model}{A 3D array of model-produced inequality matrices. In both
-    arrays, cells above the diagonal can hold any finite numbers, but not
-    missing or infinite values.}
+  \item{human}{A 3D array of observed inequality matrices, one per slice. A
+    single matrix is treated as an array with one slice.}
+  \item{model}{A 3D array of model-produced inequality matrices, or a single
+    matrix. In both \code{human} and \code{model}, cells above the diagonal
+    can hold any finite numbers, but not missing or infinite values.}
   \item{universal}{Integer. The number of theoretically possible patterns.}
   \item{weight}{A double. Specifies how much accommodation and predictions are
                 weighted in calculating g-distance, between 0 and 1. \code{0.5} weights

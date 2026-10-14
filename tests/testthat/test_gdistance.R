@@ -152,3 +152,22 @@ test_that("gdistance rejects missing values in the upper triangle", {
     expect_equal(gdistance(human, model, universal = 13, weight = 0.5,
                            frequencies = 1)$gdistance, 0)
 })
+
+test_that("gdistance accepts single matrices as one-slice arrays", {
+    a <- imac(c(0.9, 0.1, 0.5), c(0.1, -0.1))
+    b <- imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))
+    as_array <- function(m) array(m, c(dim(m), 1))
+    expect_equal(
+        gdistance(a, b, universal = 13, weight = 0.5, frequencies = 1,
+                  xtdo = TRUE),
+        gdistance(as_array(a), as_array(b), universal = 13, weight = 0.5,
+                  frequencies = 1, xtdo = TRUE))
+})
+
+test_that("gdistance explains wrongly shaped input", {
+    a <- imac(c(0.9, 0.1, 0.5), c(0.1, -0.1))
+    expect_error(gdistance(1:3, a, universal = 13, weight = 0.5,
+                           frequencies = 1), "'human' must be")
+    expect_error(gdistance(a, array(0, c(3, 3, 1, 1)), universal = 13,
+                           weight = 0.5, frequencies = 1), "'model' must be")
+})

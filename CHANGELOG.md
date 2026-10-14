@@ -18,6 +18,13 @@ Breaking changes are marked **Breaking**.
 
 ### Changed
 
+- **Breaking:** `pattern_distance()` always returns a matrix, with one row per
+  pattern in `x` and one column per pattern in `y`. For two single matrices it
+  returned a single number; it now returns a 1 x 1 matrix, so the type of the
+  result no longer depends on the shape of the input.
+- `gdistance()` accepts a single inequality matrix for `human` or `model`, as
+  an array with one slice, like `pattern_distance()`. Input of the wrong shape
+  now gives a clear error instead of an error from Armadillo.
 - The documentation of `gdistance()` and `pattern_distance()` states that
   cells above the diagonal can hold any finite numbers, not only -1, 0 and 1.
   `pattern_distance(method = "kemeny")` is described as the sum of absolute

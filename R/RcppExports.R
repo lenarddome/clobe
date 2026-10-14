@@ -5,7 +5,7 @@ brutes <- function(dependent, length, thresholds, ordering = "semiorder", return
     .Call(`_clobe_Brutes`, dependent, length, thresholds, ordering, return_matrices, return_permutations, threads)
 }
 
-gdistance <- function(human, model, universal, weight, frequencies, xtdo = FALSE) {
+.gdistance <- function(human, model, universal, weight, frequencies, xtdo = FALSE) {
     .Call(`_clobe_GDistance`, human, model, universal, weight, frequencies, xtdo)
 }
 

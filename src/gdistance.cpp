@@ -67,7 +67,7 @@ double Prediction(const std::set<std::vector<double>>& discovered,
 
 }  // namespace
 
-// [[Rcpp::export(name = "gdistance")]]
+// [[Rcpp::export(name = ".gdistance")]]
 Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
                      double universal, double weight,
                      const arma::colvec& frequencies, bool xtdo = false) {

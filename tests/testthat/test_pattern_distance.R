@@ -3,20 +3,20 @@ a <- imac(c(0.9, 0.5, 0.1), thresholds)  # 1 > 2 > 3
 b <- imac(c(0.9, 0.9, 0.1), thresholds)  # 1 = 2 > 3
 c <- imac(c(0.1, 0.5, 0.9), thresholds)  # 3 > 2 > 1
 
-test_that("pattern_distance compares two matrices", {
-    expect_equal(pattern_distance(a, a), 0)
+test_that("pattern_distance compares two matrices as one-slice arrays", {
+    expect_equal(pattern_distance(a, a), matrix(0, 1, 1))
     # one pair changes from strict to tied
-    expect_equal(pattern_distance(a, b), 1)
-    expect_equal(pattern_distance(a, b, method = "hamming"), 1)
+    expect_equal(pattern_distance(a, b), matrix(1, 1, 1))
+    expect_equal(pattern_distance(a, b, method = "hamming"), matrix(1, 1, 1))
     # every pair is reversed
-    expect_equal(pattern_distance(a, c), 6)
-    expect_equal(pattern_distance(a, c, method = "hamming"), 3)
+    expect_equal(pattern_distance(a, c), matrix(6, 1, 1))
+    expect_equal(pattern_distance(a, c, method = "hamming"), matrix(3, 1, 1))
 })
 
 test_that("pattern_distance ignores the diagonal and lower triangle", {
     d <- a
     d[lower.tri(d, diag = TRUE)] <- 0
-    expect_equal(pattern_distance(a, d), 0)
+    expect_equal(pattern_distance(a, d), matrix(0, 1, 1))
 })
 
 test_that("pattern_distance compares every pair of slices", {
@@ -41,8 +41,8 @@ test_that("pattern_distance works with graded codes", {
     # e.g. -2 (much smaller) to 2 (much larger)
     x <- matrix(c(2, 2, 2, 2, 2, 2, -2, 1, 2), 3)
     y <- matrix(c(2, 2, 2, 0, 2, 2, 2, -1, 2), 3)
-    expect_equal(pattern_distance(x, y), 2 + 4 + 2)
-    expect_equal(pattern_distance(x, y, method = "hamming"), 3)
+    expect_equal(pattern_distance(x, y), matrix(2 + 4 + 2, 1, 1))
+    expect_equal(pattern_distance(x, y, method = "hamming"), matrix(3, 1, 1))
 })
 
 test_that("pattern_distance rejects missing values in the upper triangle", {
@@ -52,5 +52,10 @@ test_that("pattern_distance rejects missing values in the upper triangle", {
     expect_error(pattern_distance(a, broken), "y")
     lower <- a
     lower[3, 1] <- NA
-    expect_equal(pattern_distance(lower, a), 0)
+    expect_equal(pattern_distance(lower, a), matrix(0, 1, 1))
+})
+
+test_that("pattern_distance always returns a matrix", {
+    expect_true(is.matrix(pattern_distance(a, b)))
+    expect_equal(dim(pattern_distance(a, simplify2array(list(a, b)))), c(1, 2))
 })

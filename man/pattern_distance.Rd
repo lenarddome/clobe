@@ -12,8 +12,9 @@ pattern_distance(x, y = x, method = c("kemeny", "hamming"))
 }
 
 \arguments{
-  \item{x, y}{Inequality matrices, such as from \code{\link{imac}}: a square
-    matrix, or a 3D array with one matrix per slice. \code{x} and \code{y}
+  \item{x, y}{Inequality matrices, such as from \code{\link{imac}}: a 3D
+    array with one matrix per slice, or a single matrix, which is treated as
+    an array with one slice. By default, \code{x} is compared with itself. \code{x} and \code{y}
     must have the same number of stimuli. Cells above the diagonal can hold
     any finite numbers, but not missing or infinite values.}
   \item{method}{\code{"kemeny"} (default) or \code{"hamming"}. See Details.}
@@ -39,9 +40,8 @@ coding.
 }
 
 \value{
-  If \code{x} and \code{y} are both matrices, a single distance. Otherwise, a
-  matrix with one row per slice of \code{x} and one column per slice of
-  \code{y}.
+  A matrix of distances with one row per slice of \code{x} and one column per
+  slice of \code{y}; for two single matrices, a 1 x 1 matrix.
 }
 
 \author{
@@ -69,6 +69,11 @@ pattern_distance(a, b)
 pattern_distance(a, c)
 pattern_distance(a, c, method = "hamming")
 
-## every pair of slices
+## every pair of slices of one array
 pattern_distance(simplify2array(list(a, b, c)))
+
+## two arrays: one row per human pattern, one column per model pattern
+human <- simplify2array(list(a, c))
+model <- simplify2array(list(a, b, c))
+pattern_distance(human, model)
 }
