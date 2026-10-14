@@ -10,6 +10,9 @@
 
 namespace {
 
+// Absolute tolerance when checking that the frequencies sum to 1.
+constexpr double kFrequencyTolerance = 1.490116119384765625e-08;  // sqrt(eps)
+
 // Two inequality matrices describe the same pattern if their strict upper
 // triangles are identical; the diagonal and lower triangle carry no
 // information.
@@ -80,7 +83,15 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
   CheckFiniteUpperTriangle(human, "human");
   CheckFiniteUpperTriangle(model, "model");
   if (frequencies.n_elem != human.n_slices) {
-    Rcpp::stop("'frequencies' must have one element per pattern in 'human'.");
+    Rcpp::stop(
+        "'frequencies' has %d values, but 'human' has %d patterns; give one "
+        "frequency per pattern.",
+        static_cast<int>(frequencies.n_elem), static_cast<int>(human.n_slices));
+  }
+  if (!frequencies.is_finite() || arma::any(frequencies < 0)) {
+    Rcpp::stop(
+        "'frequencies' must be non-negative numbers without missing "
+        "values.");
   }
   const std::set<std::vector<double>> human_patterns = UniquePatterns(human);
   const double observed = human_patterns.size();
@@ -91,6 +102,24 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
   }
   if (weight < 0 || weight > 1) {
     Rcpp::stop("'weight' must be between 0 and 1.");
+  }
+
+  // alpha sums the frequency of every accommodated slice, so it is a
+  // proportion only if the frequencies sum to 1 and each pattern appears once
+  const double total = arma::sum(frequencies);
+  if (std::fabs(total - 1) > kFrequencyTolerance) {
+    Rcpp::warning(
+        "'frequencies' sum to %g, not 1, so alpha is not a proportion; give "
+        "the proportion of people with each pattern.",
+        total);
+  }
+  const int duplicated = static_cast<int>(human.n_slices - observed);
+  if (duplicated > 0) {
+    Rcpp::warning(
+        "'human' has %d duplicated pattern%s. Beta counts each pattern once, "
+        "but alpha adds the frequency of every copy; use patterns() to keep "
+        "each pattern once with its total frequency.",
+        duplicated, duplicated == 1 ? "" : "s");
   }
 
   const arma::vec alpha = Accommodation(human, model);

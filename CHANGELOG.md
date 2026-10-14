@@ -24,6 +24,12 @@ Breaking changes are marked **Breaking**.
   pattern in `x` and one column per pattern in `y`. For two single matrices it
   returned a single number; it now returns a 1 x 1 matrix, so the type of the
   result no longer depends on the shape of the input.
+- `gdistance()` warns when `frequencies` do not sum to 1, and when `human`
+  contains the same pattern more than once: beta counts it once, but alpha
+  adds the frequency of every copy. It stops with an error if `frequencies`
+  has missing or negative values, and the error for a `frequencies` of the
+  wrong length now states both lengths. The documentation describes how
+  alpha and beta treat repeated patterns and lists every error and warning.
 - `gdistance()` accepts a single inequality matrix for `human` or `model`, as
   an array with one slice, like `pattern_distance()`. Input of the wrong shape
   now gives a clear error instead of an error from Armadillo.
@@ -35,6 +41,10 @@ Breaking changes are marked **Breaking**.
 
 ### Fixed
 
+- The package failed to build on Windows (undefined reference to `ddot_`):
+  the C++ code uses Armadillo, which calls BLAS, but `src/Makevars.win` did
+  not link BLAS and LAPACK. Both Makevars files now add `$(LAPACK_LIBS)
+  $(BLAS_LIBS) $(FLIBS)`.
 - **Breaking:** `gdistance()` and `pattern_distance()` reject inequality
   matrices with missing (`NA`, `NaN`) or infinite values above the diagonal.
   Such values cannot be compared, because `NaN` is not equal to anything,

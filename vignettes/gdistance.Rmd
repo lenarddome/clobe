@@ -211,8 +211,16 @@ not simply more or less flexible.
 ## Things to know
 
 - **Patterns are counted once.** If the model produces a pattern at many
-  parameter settings, it still counts once in $M$. The same holds for $H$;
-  use `patterns()` to get the distinct human patterns with their frequencies.
+  parameter settings, it still counts once in $M$. The same holds for $H$
+  in $\beta$.
+- **Give each human pattern once, with frequencies that sum to 1.**
+  `frequencies` must have exactly one value per slice of `human`, or
+  `gdistance()` stops. $\alpha$ adds up the frequency of every accommodated
+  slice, so a pattern that appears twice in `human` would be counted twice.
+  `gdistance()` warns if `human` repeats a pattern or if the frequencies do
+  not sum to 1 (for example, because they are counts rather than
+  proportions). `patterns()` returns the distinct patterns with frequencies
+  that sum to 1, so its output can be passed straight in.
 - **Only the upper triangle matters.** Two matrices are the same pattern if
   their cells above the diagonal agree. Those cells can hold any numbers, so
   you can code relations your own way, but not missing values: `NA` is not
