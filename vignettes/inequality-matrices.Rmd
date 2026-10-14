@@ -1,0 +1,182 @@
+---
+title: "Inequality matrices: semiorders and weak orderings"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Inequality matrices: semiorders and weak orderings}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r}
+library(clobe)
+```
+
+Many psychological theories make *ordinal* predictions: "people will respond
+more to A than to B", "C and D will not differ". clobe therefore describes a
+result not by its exact numbers but by its ordinal pattern: the relation
+between every pair of conditions. This vignette explains how that pattern is
+built and what kind of mathematical object it is.
+
+## From numbers to an inequality matrix
+
+Suppose a participant's results in $n$ conditions (stimuli) are
+$v_1, v_2, \ldots, v_n$. For every pair of stimuli $i < j$ we record one of
+three relations:
+
+$$
+m_{ij} =
+\begin{cases}
+\phantom{-}1 & \text{if } v_i - v_j > T \quad (i \text{ is larger than } j)\\
+-1 & \text{if } v_i - v_j < -T \quad (i \text{ is smaller than } j)\\
+\phantom{-}0 & \text{otherwise} \quad (i \text{ and } j \text{ are about the same})
+\end{cases}
+$$
+
+$T$ is the **threshold**: the largest difference that we treat as no
+difference at all. It should reflect how precisely the quantity is measured;
+for example, a difference of one trial out of twenty is probably noise.
+
+`imac()` (inequality matrix constructor) builds the matrix. The thresholds
+are given as `c(upper, lower)`, normally `c(T, -T)`:
+
+```{r}
+imac(c(0.9, 0.5, 0.45, 0.1), thresholds = c(0.1, -0.1))
+```
+
+Read it row against column. Row 1, column 2 is `1`: stimulus 1 (0.9) is larger
+than stimulus 2 (0.5). Row 2, column 3 is `0`: 0.5 and 0.45 are within 0.1 of
+each other. The diagonal and everything below it are set to `2`, because they
+repeat information already in the upper triangle (the relation of $j$ to $i$
+is the opposite of $i$ to $j$). So a pattern over $n$ stimuli consists of
+$n(n-1)/2$ relations, one per pair.
+
+Two results have the **same pattern** if their upper triangles are equal,
+even if their numbers differ:
+
+```{r}
+a <- imac(c(0.9, 0.5, 0.45, 0.1), c(0.1, -0.1))
+b <- imac(c(0.8, 0.4, 0.42, 0.2), c(0.1, -0.1))
+identical(a[upper.tri(a)], b[upper.tri(b)])
+```
+
+### A note on rounding
+
+Computers store most decimals inexactly: `0.3 - 0.2` is not quite `0.1`.
+
+```{r}
+0.3 - 0.2 == 0.1
+```
+
+Without care, a difference that should sit exactly on the threshold could land
+on either side of it depending on which numbers produced it. `imac()`
+compares differences with a tiny tolerance (about $1.5 \times 10^{-8}$), so
+equal steps are always treated alike.
+
+## "About the same" is not transitive
+
+The relation "is larger than" behaves as you would expect: if $a$ is larger
+than $b$ and $b$ is larger than $c$, then $a$ is larger than $c$. "About the
+same" does not. Here is a classic illustration (Luce, 1956): you cannot taste
+the difference between a cup of coffee with 50 grains of sugar and one with
+51, nor between 51 and 52, and so on, yet you can certainly taste the
+difference between 50 and 100 grains.
+
+The same happens with any threshold:
+
+```{r}
+imac(c(0.50, 0.58, 0.66), thresholds = c(0.1, -0.1))
+```
+
+Stimuli 1 and 2 are about the same (they differ by 0.08), as are 2 and 3, but
+stimulus 1 is smaller than stimulus 3 (they differ by 0.16).
+
+### Semiorders
+
+A relation built this way, where $a$ counts as larger than $b$ only when it
+exceeds $b$ by more than a fixed margin,
+
+$$
+a \succ b \iff u(a) > u(b) + T,
+$$
+
+is called a **semiorder** (Luce, 1956). Scott and Suppes (1958) showed that,
+on a finite set, these are exactly the relations $\succ$ with three
+properties:
+
+1. Nothing is larger than itself.
+2. If $a \succ b$ and $c \succ d$, then $a \succ d$ or $c \succ b$.
+   *(Two clear differences cannot "cross" each other.)*
+3. If $a \succ b$ and $b \succ c$, then for any other $d$, $a \succ d$ or
+   $d \succ c$. *(A gap of two clear steps is too wide for anything to be
+   about the same as both ends.)*
+
+So every inequality matrix from `imac()` with symmetric thresholds is a
+semiorder, and this is the default, `ordering = "semiorder"`. It is the right
+choice when the threshold expresses measurement uncertainty, as it usually
+does.
+
+### Weak orderings
+
+Sometimes we want "about the same" to mean "exactly tied". Then the relation
+is a **weak ordering**: a ranking in which ties are allowed. Its tied groups
+can be ranked from top to bottom, and "tied with" is transitive. With
+`ordering = "weak"`, `imac()` ignores the thresholds and treats only exact
+ties as equal:
+
+```{r}
+imac(c(0.50, 0.58, 0.66), thresholds = c(0.1, -0.1), ordering = "weak")
+imac(c(0.50, 0.50, 0.66), thresholds = c(0.1, -0.1), ordering = "weak")
+```
+
+Formally, a weak ordering is a semiorder with $T = 0$:
+$a \succ b \iff u(a) > u(b)$.
+
+### What the difference looks like
+
+Every weak ordering is a semiorder, but not the other way round. For three
+stimuli there are 19 semiorders and 13 weak orderings. The 6 extra patterns
+are exactly the "sugar in coffee" chains: two neighbours are each about the
+same as the middle stimulus but clearly different from each other, in each of
+the six ways of assigning stimuli to the three positions.
+
+```{r}
+key <- function(x) {
+  apply(x, 3, function(m) paste(m[upper.tri(m)], collapse = ","))
+}
+semi <- orderings(3)$inequality_matrices
+weak <- orderings(3, ordering = "weak")$inequality_matrices
+extra <- semi[, , !(key(semi) %in% key(weak)), drop = FALSE]
+dim(extra)[3]
+extra[, , 1]
+```
+
+In this one, stimulus 3 is about the same as both 1 and 2, but 1 is smaller
+than 2.
+
+## Choosing the thresholds
+
+- Use **symmetric** thresholds, `c(T, -T)`. With asymmetric thresholds,
+  whether a pair counts as different depends on which stimulus comes first,
+  which is rarely intended.
+- Choose $T$ from how precisely the dependent variable is measured. For
+  proportions from $N$ trials, one trial is a step of $1/N$.
+- The patterns you can observe also depend on how finely the measurement
+  scale is divided relative to $T$. `vignette("universal-set")` shows why
+  this matters when counting the possible patterns.
+
+## References
+
+Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and
+human heterogeneity. *Psychological Review, 132*(3), 632-655.
+https://doi.org/10.1037/rev0000550
+
+Luce, R. D. (1956). Semiorders and a theory of utility discrimination.
+*Econometrica, 24*(2), 178-191. https://doi.org/10.2307/1905751
+
+Scott, D., & Suppes, P. (1958). Foundational aspects of theories of
+measurement. *Journal of Symbolic Logic, 23*(2), 113-128.
+https://doi.org/10.2307/2964389

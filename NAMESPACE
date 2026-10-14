@@ -1,4 +1,5 @@
 useDynLib(clobe, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
-import(RcppAlgos)
-exportPattern("^[[:alpha:]]+")
+importFrom(RcppParallel, RcppParallelLibs)
+export(brutes, fubini, gdistance, imac, orderings, pattern_distance, patterns,
+       semiorders, stirling2)

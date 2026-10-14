@@ -1,23 +1,39 @@
 // Copyright 2022 <Lenard Dome> [legal/copyright]
 // [[Rcpp::depends(RcppArmadillo)]]
+#include "imac.h"
+
 #include <RcppArmadillo.h>
 
-// [[Rcpp::depends(RcppArmadillo)]]
-using namespace Rcpp;
-using namespace arma;
+#include <string>
 
-// [[Rcpp::export]]
-arma::mat imac(arma::vec probabilities, arma::vec thresholds) {
-  // setup environment
-  mat inequality(probabilities.n_elem, probabilities.n_elem, fill::value(2));
-  for (uword i = 0; i < probabilities.n_elem; i++) {
-    for (uword k = i + 1; k < probabilities.n_elem; k++) {
-      inequality(i, k) =  probabilities[i] - probabilities[k];
+void CheckThresholds(const arma::vec& thresholds) {
+  if (thresholds.n_elem != 2) {
+    Rcpp::stop("'thresholds' must have exactly 2 elements: c(upper, lower).");
+  }
+  if (thresholds[0] < thresholds[1]) {
+    Rcpp::stop("'thresholds' must be c(upper, lower) with upper >= lower.");
+  }
+}
+
+bool IsWeakOrdering(const std::string& ordering) {
+  if (ordering == "semiorder") return false;
+  if (ordering == "weak") return true;
+  Rcpp::stop("'ordering' must be either \"semiorder\" or \"weak\".");
+}
+
+// [[Rcpp::export(name = "imac")]]
+arma::mat Imac(const arma::vec& probabilities, const arma::vec& thresholds,
+               const std::string& ordering = "semiorder") {
+  CheckThresholds(thresholds);
+  const bool weak = IsWeakOrdering(ordering);
+  // Cells on and below the diagonal are not compared and take the value 2.
+  arma::mat inequality(probabilities.n_elem, probabilities.n_elem,
+                       arma::fill::value(2));
+  for (arma::uword i = 0; i < probabilities.n_elem; i++) {
+    for (arma::uword k = i + 1; k < probabilities.n_elem; k++) {
+      inequality(i, k) = ImacClassify(probabilities[i] - probabilities[k],
+                                      thresholds[0], thresholds[1], weak);
     }
   }
-  // apply the rules to the differences
-  inequality.elem( find(inequality >= thresholds[0] && inequality < 2)).fill(1);
-  inequality.elem( find(inequality <= thresholds[1])).fill(-1);
-  inequality.elem( find(inequality > thresholds[1] && inequality < thresholds[0])).fill(0);
-  return(inequality);
+  return inequality;
 }

@@ -1,5 +1,3 @@
 library(testthat)
-library(plyr)
-library(abind)
 library(clobe)
 test_check("clobe")

@@ -1,49 +1,222 @@
-library(plyr)
-library(abind)
-library(testthat)
-load('data/test_gdistance.RData')
+load("data/test_gdistance.RData")
+
+# patterns are compared on their strict upper triangles
+keys <- function(x) {
+    apply(x, 3, function(m) paste(m[upper.tri(m)], collapse = ","))
+}
+
+# in the fixture, all 6 human slices are accommodated by the model; they hold
+# 3 unique patterns, and the model's 20 slices hold 8 unique patterns
+human_unique <- length(unique(keys(predicted)))
+novel <- sum(!(unique(keys(discovered)) %in% keys(predicted)))
+
+# the fixture repeats patterns in human and its frequencies do not sum to 1,
+# which gdistance() warns about; the tests below check those warnings
+# separately, so they are muffled for the calculations on the fixture
+fixture <- function(expr) {
+    withCallingHandlers(expr, warning = function(w) {
+        if (grepl("sum to|duplicated", conditionMessage(w))) {
+            invokeRestart("muffleWarning")
+        }
+    })
+}
+
+test_that("the fixture has duplicated patterns", {
+    expect_equal(human_unique, 3)
+    expect_equal(novel, 5)
+})
 
 # simple g-distance
 
-normal <- gdistance(human = predicted, model = discovered,
-          universal = 30, weight = 0.5, frequencies = matrix(rep(1, 6)/sum(1:6)),
-          xtdo = TRUE)
+frequencies <- rep(1, 6) / sum(1:6)
+normal <- fixture(gdistance(human = predicted, model = discovered,
+          universal = 30, weight = 0.5, frequencies = frequencies,
+          xtdo = TRUE))
 
 test_that("gdistance calculation is correct for a simple example", {
-    expect_equal(normal, regular)
+    alpha <- sum(frequencies)
+    beta <- novel / (30 - human_unique)
+    expect_equal(normal$alpha, alpha)
+    expect_equal(normal$beta, beta)
+    expect_equal(normal$gdistance, sqrt(0.5 * (1 - alpha)^2 + 0.5 * beta^2))
+    expect_equal(normal$accommodation, 1:6)
 })
 
-# weighted accomodation
+# weighted accommodation
 
 weights <- c(2, 31, 5, 32, 31, 9)
-weighted <- gdistance(human = predicted, model = discovered,
-          universal = 20, weight = 0.5, frequencies = matrix(weights/sum(weights)),
-          xtdo = TRUE)
+weighted <- fixture(gdistance(human = predicted, model = discovered,
+          universal = 20, weight = 0.5, frequencies = weights / sum(weights),
+          xtdo = TRUE))
 
-test_that("gdistance calculation is correct for a simple example", {
-    expect_equal(weighted, weighting)
+test_that("gdistance calculation is correct for weighted accommodation", {
+    beta <- novel / (20 - human_unique)
+    expect_equal(weighted$alpha, 1)
+    expect_equal(weighted$beta, beta)
+    expect_equal(weighted$gdistance, sqrt(0.5 * beta^2))
 })
 
 # weighted g-distance
 
 curve <- NULL
 for (i in seq(0, 1, by = .10)) {
-    out <- gdistance(human = predicted, model = discovered,
-                     universal = 20, weight = i, frequencies = matrix(rep(1, 6)/sum(1:6)),
-                     xtdo = TRUE)
+    out <- fixture(gdistance(human = predicted, model = discovered,
+                     universal = 20, weight = i, frequencies = frequencies))
     curve <- c(curve, out$gdistance)
 }
 
 test_that("gdistance calculation is correct for weighted gdistance", {
-    expect_equal(curve, curvature)
+    w <- seq(0, 1, by = .10)
+    alpha <- sum(frequencies)
+    beta <- novel / (20 - human_unique)
+    expect_equal(curve, sqrt(w * (1 - alpha)^2 + (1 - w) * beta^2))
+})
+
+test_that("accommodation returns 1-based indices of human patterns", {
+    human <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                 imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))))
+    model <- human[, , 2, drop = FALSE]
+    out <- gdistance(human, model, universal = 13, weight = 0.5,
+                     frequencies = c(0.5, 0.5), xtdo = TRUE)
+    expect_equal(out$accommodation, 2)
+    expect_equal(out$alpha, 0.5)
+    expect_equal(out$beta, 0)
+})
+
+test_that("prediction ignores the diagonal and lower triangle", {
+    human <- array(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)), c(3, 3, 1))
+    model <- human
+    model[, , 1][lower.tri(model[, , 1], diag = TRUE)] <- 0
+    out <- gdistance(human, model, universal = 13, weight = 0.5,
+                     frequencies = 1, xtdo = TRUE)
+    expect_equal(out$alpha, 1)
+    expect_equal(out$beta, 0)
+})
+
+test_that("beta counts each pattern once", {
+    a <- imac(c(0.9, 0.1, 0.5), c(0.1, -0.1))
+    b <- imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))
+    c <- imac(c(0.5, 0.5, 0.5), c(0.1, -0.1))
+    # the human pattern a twice; the novel model patterns b and c, b twice
+    human <- simplify2array(list(a, a))
+    model <- simplify2array(list(a, b, b, c))
+    expect_warning(
+        out <- gdistance(human, model, universal = 13, weight = 0.5,
+                         frequencies = c(0.5, 0.5), xtdo = TRUE),
+        "duplicated")
+    expect_equal(out$beta, 2 / (13 - 1))
 })
 
 ## test warning messages
 
-test_that("gdistance warning checks", {
-    expect_warning({
-        normal <- gdistance(human = predicted, model = predicted,
-          universal = 6, weight = 0.5, frequencies = matrix(rep(1, 6)/sum(1:6)),
-          xtdo = TRUE)
-          })
+test_that("gdistance warns when every possible pattern is observed", {
+    expect_warning(
+        normal <- fixture(gdistance(human = predicted, model = predicted,
+          universal = human_unique, weight = 0.5, frequencies = frequencies,
+          xtdo = TRUE)),
+        "beta")
+    expect_true(is.nan(normal$beta))
+})
+
+test_that("gdistance rejects invalid input", {
+    expect_error(gdistance(predicted, discovered, universal = 30, weight = 0.5,
+                           frequencies = rep(1, 5)),
+                 "'frequencies' has 5 values, but 'human' has 6 patterns")
+    expect_error(gdistance(predicted, discovered, universal = 2, weight = 0.5,
+                           frequencies = frequencies), "universal")
+    expect_error(gdistance(predicted, discovered, universal = 30, weight = 2,
+                           frequencies = frequencies), "weight")
+    expect_error(gdistance(predicted, discovered[1:2, 1:2, , drop = FALSE],
+                           universal = 30, weight = 0.5,
+                           frequencies = frequencies),
+                 "dimensions")
+})
+
+test_that("gdistance works with any numeric coding of the relations", {
+    # recoding -1, 0, 1 as 5, 7, 9 does not change which patterns are equal
+    recode <- function(x) {
+        upper <- array(upper.tri(x[, , 1]), dim(x))
+        x[upper] <- c(5, 7, 9)[x[upper] + 2]
+        x
+    }
+    human <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                 imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))))
+    model <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                 imac(c(0.5, 0.5, 0.5), c(0.1, -0.1))))
+    expect_equal(
+        gdistance(recode(human), recode(model), universal = 13, weight = 0.5,
+                  frequencies = c(0.5, 0.5), xtdo = TRUE),
+        gdistance(human, model, universal = 13, weight = 0.5,
+                  frequencies = c(0.5, 0.5), xtdo = TRUE))
+})
+
+test_that("gdistance rejects missing values in the upper triangle", {
+    human <- array(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)), c(3, 3, 1))
+    model <- human
+    for (value in c(NA, NaN, Inf)) {
+        broken <- human
+        broken[1, 2, 1] <- value
+        expect_error(gdistance(broken, model, universal = 13, weight = 0.5,
+                               frequencies = 1), "human")
+        expect_error(gdistance(human, broken, universal = 13, weight = 0.5,
+                               frequencies = 1), "model")
+    }
+    # the diagonal and lower triangle are ignored
+    human[2, 1, 1] <- NA
+    expect_equal(gdistance(human, model, universal = 13, weight = 0.5,
+                           frequencies = 1)$gdistance, 0)
+})
+
+test_that("gdistance accepts single matrices as one-slice arrays", {
+    a <- imac(c(0.9, 0.1, 0.5), c(0.1, -0.1))
+    b <- imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))
+    as_array <- function(m) array(m, c(dim(m), 1))
+    expect_equal(
+        gdistance(a, b, universal = 13, weight = 0.5, frequencies = 1,
+                  xtdo = TRUE),
+        gdistance(as_array(a), as_array(b), universal = 13, weight = 0.5,
+                  frequencies = 1, xtdo = TRUE))
+})
+
+test_that("gdistance explains wrongly shaped input", {
+    a <- imac(c(0.9, 0.1, 0.5), c(0.1, -0.1))
+    expect_error(gdistance(1:3, a, universal = 13, weight = 0.5,
+                           frequencies = 1), "'human' must be")
+    expect_error(gdistance(a, array(0, c(3, 3, 1, 1)), universal = 13,
+                           weight = 0.5, frequencies = 1), "'model' must be")
+})
+
+# three distinct patterns of 3 stimuli
+distinct <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                imac(c(0.1, 0.9, 0.5), c(0.1, -0.1)),
+                                imac(c(0.5, 0.5, 0.5), c(0.1, -0.1))))
+
+test_that("gdistance is silent for distinct patterns with frequencies summing to 1", {
+    expect_silent(gdistance(distinct, distinct[, , 1, drop = FALSE],
+                            universal = 19, weight = 0.5,
+                            frequencies = c(1, 1, 1) / 3))
+})
+
+test_that("gdistance warns when frequencies do not sum to 1", {
+    expect_warning(gdistance(distinct, distinct, universal = 19, weight = 0.5,
+                             frequencies = c(0.5, 0.3, 0.1)),
+                   "'frequencies' sum to 0.9")
+    # counts instead of proportions
+    expect_warning(gdistance(distinct, distinct, universal = 19, weight = 0.5,
+                             frequencies = c(12, 5, 3)),
+                   "'frequencies' sum to 20")
+})
+
+test_that("gdistance warns when human repeats a pattern", {
+    human <- distinct[, , c(1, 2, 1, 1)]
+    expect_warning(gdistance(human, distinct, universal = 19, weight = 0.5,
+                             frequencies = rep(0.25, 4)),
+                   "2 duplicated patterns.*patterns\\(\\)")
+})
+
+test_that("gdistance rejects missing or negative frequencies", {
+    expect_error(gdistance(distinct, distinct, universal = 19, weight = 0.5,
+                           frequencies = c(0.5, NA, 0.5)), "frequencies")
+    expect_error(gdistance(distinct, distinct, universal = 19, weight = 0.5,
+                           frequencies = c(0.5, -0.5, 1)), "frequencies")
 })

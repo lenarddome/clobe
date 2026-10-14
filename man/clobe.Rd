@@ -3,7 +3,7 @@
 \docType{package}
 \title{
 
-    Qualitative Global Benchmark and Evaluation Toolkit for Formal Compuational Models
+    Qualitative Global Benchmark and Evaluation Toolkit for Formal Computational Models
 
 }
 
@@ -11,17 +11,20 @@
     
         Provides tools for the qualitative evaluation of formal computational models.
         Currently incorporates tools used in comparing model and human heterogeneity,
-        see Dome and Wills (2023) <doi:10.31234/osf.io/ygmcj>.
+        see Dome and Wills (2025) <doi:10.1037/rev0000550>.
 
 Please cite the package in publications. Use \code{citation("clobe")}.
 
 }
 
-\keyword{computational modelling; parameter space partitioning; model evaluation}
+\keyword{package}
+\concept{computational modelling}
+\concept{parameter space partitioning}
+\concept{model evaluation}
 
 \author{
 
-    Lenard Dome
+    Lenard Dome, Andy Wills
 
     Maintainer: Lenard Dome \email{lenarddome@gmail.com}
 
@@ -29,6 +32,6 @@ Please cite the package in publications. Use \code{citation("clobe")}.
 
 \references{
 
-    Dome, L., & Wills, A. (2023, April 11). g-distance: On the comparison of model and human heterogeneity. PsyArxiv.
+    Dome, L., & Wills, A. J. (2025). g-Distance: On the comparison of model and human heterogeneity. Psychological Review, 132(3), 632-655. https://doi.org/10.1037/rev0000550
 
 }
