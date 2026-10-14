@@ -9,6 +9,8 @@ Breaking changes are marked **Breaking**.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-14
+
 ### Added
 
 - Vignettes that explain the methods and their mathematics: getting started
@@ -143,6 +145,7 @@ Breaking changes are marked **Breaking**.
 
 Last version before this changelog was kept.
 
-[Unreleased]: https://github.com/lenarddome/clobe/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/lenarddome/clobe/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/lenarddome/clobe/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/lenarddome/clobe/compare/v0.6-beta...v0.7.0
 [0.6.0]: https://github.com/lenarddome/clobe/releases/tag/v0.6-beta
