@@ -214,7 +214,9 @@ not simply more or less flexible.
   parameter settings, it still counts once in $M$. The same holds for $H$;
   use `patterns()` to get the distinct human patterns with their frequencies.
 - **Only the upper triangle matters.** Two matrices are the same pattern if
-  their cells above the diagonal agree.
+  their cells above the diagonal agree. Those cells can hold any numbers, so
+  you can code relations your own way, but not missing values: `NA` is not
+  equal to anything, not even another `NA`, so `gdistance()` rejects it.
 - **When people show every possible pattern**, $|U| - |H| = 0$ and $\beta$
   cannot be computed. `gdistance()` then warns, sets `beta` to `NaN` and
   uses accommodation alone.
@@ -225,14 +227,20 @@ not simply more or less flexible.
 ## Near misses
 
 $\alpha$ treats a missed pattern as missed, however close the model came.
-`pattern_distance()` tells you how close that was. Its default, the
-Kemeny-Snell distance, adds 1 for every pair of stimuli that is ordered in
-one pattern and about the same in the other, and 2 for every pair whose order
-is reversed:
+`pattern_distance()` tells you how close that was. Its default adds up the
+differences between the two patterns, pair by pair:
 
 $$
 d(a, b) = \sum_{i < j} |a_{ij} - b_{ij}|.
 $$
+
+With the usual coding of 1, 0 and -1, this is the Kemeny-Snell distance: it
+adds 1 for every pair of stimuli that is ordered in one pattern and about the
+same in the other, and 2 for every pair whose order is reversed. If you code
+relations in more levels, for example -2 (much smaller) to 2 (much larger),
+it adds the number of levels between the two relations. If your codes are
+just labels without an order, use `method = "hamming"`, which counts the
+pairs that differ.
 
 In the worked example, the model missed pattern C (all three stimuli about
 the same). How close did it get?
