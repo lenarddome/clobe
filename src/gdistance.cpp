@@ -6,6 +6,8 @@
 #include <set>
 #include <vector>
 
+#include "upper_triangle.h"
+
 namespace {
 
 // Two inequality matrices describe the same pattern if their strict upper
@@ -75,6 +77,8 @@ Rcpp::List GDistance(const arma::cube& human, const arma::cube& model,
         "'human' and 'model' must contain square matrices of the same "
         "dimensions.");
   }
+  CheckFiniteUpperTriangle(human, "human");
+  CheckFiniteUpperTriangle(model, "model");
   if (frequencies.n_elem != human.n_slices) {
     Rcpp::stop("'frequencies' must have one element per pattern in 'human'.");
   }

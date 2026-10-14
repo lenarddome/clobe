@@ -36,3 +36,21 @@ test_that("pattern_distance rejects invalid input", {
     expect_error(pattern_distance(a, b, method = "euclid"))
     expect_error(pattern_distance(1:3, a), "square")
 })
+
+test_that("pattern_distance works with graded codes", {
+    # e.g. -2 (much smaller) to 2 (much larger)
+    x <- matrix(c(2, 2, 2, 2, 2, 2, -2, 1, 2), 3)
+    y <- matrix(c(2, 2, 2, 0, 2, 2, 2, -1, 2), 3)
+    expect_equal(pattern_distance(x, y), 2 + 4 + 2)
+    expect_equal(pattern_distance(x, y, method = "hamming"), 3)
+})
+
+test_that("pattern_distance rejects missing values in the upper triangle", {
+    broken <- a
+    broken[1, 3] <- NA
+    expect_error(pattern_distance(broken, b), "x")
+    expect_error(pattern_distance(a, broken), "y")
+    lower <- a
+    lower[3, 1] <- NA
+    expect_equal(pattern_distance(lower, a), 0)
+})

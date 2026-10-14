@@ -117,3 +117,38 @@ test_that("gdistance rejects invalid input", {
                            frequencies = frequencies),
                  "dimensions")
 })
+
+test_that("gdistance works with any numeric coding of the relations", {
+    # recoding -1, 0, 1 as 5, 7, 9 does not change which patterns are equal
+    recode <- function(x) {
+        upper <- array(upper.tri(x[, , 1]), dim(x))
+        x[upper] <- c(5, 7, 9)[x[upper] + 2]
+        x
+    }
+    human <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                 imac(c(0.1, 0.9, 0.5), c(0.1, -0.1))))
+    model <- simplify2array(list(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)),
+                                 imac(c(0.5, 0.5, 0.5), c(0.1, -0.1))))
+    expect_equal(
+        gdistance(recode(human), recode(model), universal = 13, weight = 0.5,
+                  frequencies = c(0.5, 0.5), xtdo = TRUE),
+        gdistance(human, model, universal = 13, weight = 0.5,
+                  frequencies = c(0.5, 0.5), xtdo = TRUE))
+})
+
+test_that("gdistance rejects missing values in the upper triangle", {
+    human <- array(imac(c(0.9, 0.1, 0.5), c(0.1, -0.1)), c(3, 3, 1))
+    model <- human
+    for (value in c(NA, NaN, Inf)) {
+        broken <- human
+        broken[1, 2, 1] <- value
+        expect_error(gdistance(broken, model, universal = 13, weight = 0.5,
+                               frequencies = 1), "human")
+        expect_error(gdistance(human, broken, universal = 13, weight = 0.5,
+                               frequencies = 1), "model")
+    }
+    # the diagonal and lower triangle are ignored
+    human[2, 1, 1] <- NA
+    expect_equal(gdistance(human, model, universal = 13, weight = 0.5,
+                           frequencies = 1)$gdistance, 0)
+})

@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "upper_triangle.h"
+
 namespace {
 
 // Returns the strict upper triangles of the slices of patterns, one column
@@ -30,6 +32,8 @@ arma::mat PatternDistance(const arma::cube& x, const arma::cube& y,
   if (method != "kemeny" && method != "hamming") {
     Rcpp::stop("'method' must be either \"kemeny\" or \"hamming\".");
   }
+  CheckFiniteUpperTriangle(x, "x");
+  CheckFiniteUpperTriangle(y, "y");
   const bool kemeny = method == "kemeny";
   const arma::mat a = UpperTriangles(x);
   const arma::mat b = UpperTriangles(y);

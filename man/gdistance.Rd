@@ -10,7 +10,9 @@
 }
 \arguments{
   \item{human}{A 3D array of observed inequality matrices.}
-  \item{model}{A 3D array of model-produced inequality matrices.}
+  \item{model}{A 3D array of model-produced inequality matrices. In both
+    arrays, cells above the diagonal can hold any finite numbers, but not
+    missing or infinite values.}
   \item{universal}{Integer. The number of theoretically possible patterns.}
   \item{weight}{A double. Specifies how much accommodation and predictions are
                 weighted in calculating g-distance, between 0 and 1. \code{0.5} weights
@@ -30,7 +32,8 @@
    \deqn{ g = \sqrt{ w(1 - \alpha)^2 + (1-w)\beta^2 } .}
 
    Two inequality matrices are the same pattern if their strict upper
-   triangles are identical (see \code{\link{imac}}). Beta counts each
+   triangles are identical (see \code{\link{imac}}), so any coding of the
+   relations works, as long as each relation always has the same code. Beta counts each
    unique pattern once, however often it occurs in \code{human} or
    \code{model}.
 

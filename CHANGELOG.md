@@ -16,6 +16,26 @@ Breaking changes are marked **Breaking**.
   (`vignette("inequality-matrices")`), counting the universal set
   (`vignette("universal-set")`), and g-distance (`vignette("gdistance")`).
 
+### Changed
+
+- The documentation of `gdistance()` and `pattern_distance()` states that
+  cells above the diagonal can hold any finite numbers, not only -1, 0 and 1.
+  `pattern_distance(method = "kemeny")` is described as the sum of absolute
+  differences between cells, which is the Kemeny-Snell distance for the
+  coding of `imac()`; `method = "hamming"` suits codes without an order.
+
+### Fixed
+
+- **Breaking:** `gdistance()` and `pattern_distance()` reject inequality
+  matrices with missing (`NA`, `NaN`) or infinite values above the diagonal.
+  Such values cannot be compared, because `NaN` is not equal to anything,
+  including itself. In 0.6.0, a pattern with a missing value never matched any
+  pattern, not even an identical one, so it was never accommodated and always
+  counted as a novel prediction. In 0.7.0, missing values could also break
+  the ordering of the set used to count unique patterns for beta, so that
+  patterns were wrongly merged or kept apart. Values on and below the diagonal
+  are still ignored.
+
 ## [0.7.0] - 2026-10-06
 
 ### Added
